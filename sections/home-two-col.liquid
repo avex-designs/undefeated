@@ -1,0 +1,96 @@
+<section id="home-two-col">
+    
+   	{% for block in section.blocks %}
+    <div>
+      
+      {% if block.settings.link %}
+      <a href="{{ block.settings.link }}">
+      {% else %}  
+      <span class="non_link">
+      {% endif %}
+      	<img src="{{ block.settings.image-picker | img_url: '800x' }}" alt="{{ block.settings.image.alt }}">
+      {% if block.settings.link %}
+      </a>
+      {% else %}
+      </span>
+      {% endif %}
+      
+      
+      <div>
+        
+        {% if block.settings.link %}
+        <a href="{{ block.settings.link }}">
+        {% else %}  
+        <span class="non_link">
+        {% endif %}
+          <h3> {{ block.settings.title }} </h3>
+        {% if block.settings.link %}
+        </a>
+        {% else %}
+        </span>
+        {% endif %}
+      
+      </div>
+      
+      
+    </div>
+    {% endfor %}
+
+</section>
+
+{% schema %}
+  {
+    "name": "Two Column",
+    "blocks": [
+      {
+        "type": "select",
+        "name": "Add Grid",
+        "settings": [
+          {
+			"id": "title",
+            "type": "text",
+            "label": "Title",
+            "default": "Default title"
+          },
+          {
+            "id": "linktext",
+            "type": "text",
+            "label": "Button text",
+            "default": "Click here"
+          },
+		  {
+            "id": "link",
+            "type": "url",
+            "label": "Button link"
+          },
+		  {
+            "id": "image-picker",
+            "type": "image_picker",
+            "label": "Background Image"
+          }
+        ]
+      }
+    ],
+	"presets": [
+		{
+    		"name": "Two Column",
+    		"category": "Home",
+            "blocks": [
+              { 
+                "type": "select"
+              },
+              {
+                "type": "select"
+              }
+            ]
+		}
+	]
+  }
+{% endschema %}
+
+{% stylesheet %}
+
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

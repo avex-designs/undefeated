@@ -1,0 +1,30 @@
+<section id="footer_text">
+
+  {{ section.settings.copy }}
+
+</section>
+{% schema %}
+  {
+    "name": "Bottom Text",
+    "settings": [
+        {
+          "id": "copy",
+          "type": "textarea",
+          "label": "Title",
+          "default": "Default Text"
+        }
+	],
+	"presets": [
+      {
+        "name": "Bottom Text",
+        "category": "Home"
+      }
+	]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

@@ -1,0 +1,202 @@
+<script type="text/javascript">
+$(function() {
+
+
+  $('#search_init_btn').click(function(){
+
+    if ( ! $('#banana_Search').hasClass('active') ) {
+
+        $('#banana_Search').slideDown({
+          start: function () {
+            $(this).css({
+              display: "flex"
+            })
+          }
+        });
+
+        $('.search-bar-wrappa').addClass('active');
+        $('#banana_Search').addClass('active');
+
+        $(document).on("click", function(e) {
+
+          var noRedirect = '.search-bar-wrappa form input, #search_init_btn, #banana_Search, #search-results-wrapper, #search-results-wrapper > *, .view-all-search-prod, .view-all-search-prod > *, .view-all-search-articles, .view-all-search-articles > *, .title';
+
+          if ( e.target.matches(noRedirect) === false ) {
+            $('#banana_Search').slideUp('200');
+            $('.search-bar-wrappa').removeClass('active');
+            $('#banana_Search').removeClass('active');
+          }
+
+        });
+
+    } else {
+
+      $('#banana_Search').slideUp('200');
+      $('.search-bar-wrappa').removeClass('active');
+      $('#banana_Search').removeClass('active');
+
+    }
+
+  });
+
+{% comment %}
+  $('#mob_search_init_btn, #mob_search_init_btn>span, #mob_search_init_btn img').click(function(){
+
+      $('.mob-search-bar-wrappa').addClass('active-o');
+      $('#banana_Search').addClass('active-o');
+
+      $(document).on("click", function(e) {
+
+        var noRedirect = '#mob_search_init_btn, #mob_search_init_btn>span, #mob_search_init_btn img, #banana_Search, #search-results-wrapper, #search-results-wrapper > *, .view-all-search-prod, .view-all-search-prod > *, .view-all-search-articles, .view-all-search-articles > *, .title, .mob-search-bar-wrappa form input';
+
+        if ( e.target.matches(noRedirect) === false ) {
+          $('.mob-search-bar-wrappa').removeClass('active-o');
+          $('#banana_Search').removeClass('active-o');
+        }
+
+      });
+
+  }); 
+{% endcomment %}
+  
+
+  // Current Ajax request.
+  var currentAjaxRequest = null;
+
+  $('<ul class="search-results-products"></ul>').css( { 'position': 'relative' } ).appendTo($('#product-search-results')); 
+  
+  $('<ul class="search-results-articles"></ul>').css( { 'position': 'relative' } ).appendTo($('#articles-search-results')); 
+  
+  //var searchForms = $('form[action="/search"]').css('position','relative').each(function() {
+    
+  // Grabbing text input.
+  var input = $(this).find('input[name="q"]');
+    
+    
+    function prodSearch(termProduct) {
+      
+      var form = $('#product-search-results');
+      var resultsLists = form.find('.search-results-products');
+      
+      // If that's a new term and it contains at least 3 characters.
+      if (termProduct.length > 3 && termProduct != $(this).attr('data-old-term')) {
+        
+        //$('.view-all-search-prod').empty();
+        $('.products_number').empty();
+        
+        // Killing any Ajax request that's currently being processed.
+        if (currentAjaxRequest != null) currentAjaxRequest.abort();
+        
+        // Saving old query.
+        $(this).attr('data-old-term', termProduct);
+        
+        // Pulling results.
+        currentAjaxRequest = $.getJSON(termProduct + '&view=json',  function(data) {
+          
+          // Reset results.
+          resultsLists.empty();
+
+          var coun = 0;
+          $.each(data.results, function(index, item) {
+            coun++
+
+            if ( coun == 10 ) {
+              var link = $('<a></a>').attr('href', item.url);
+              link.append('<span class="grid-product__title">' + item.title + '</span>');
+              link.wrapAll('<li class="results"></li>');
+              resultsLists.append(link.parent() , '<li class="results">...</li>');
+
+            } else {
+                var link = $('<a></a>').attr('href', item.url);
+                link.append('<span class="grid-product__title">' + item.title + '</span>');
+                link.wrapAll('<li class="results"></li>');
+                resultsLists.append(link.parent());
+            }
+
+          });
+
+          //$('.view-all-search-prod').append('<div><span class="title non"><a href="' + termProduct + '">Products (' + data.results_count + ')</a></span><span class="view-all"><a href="' + termProduct + '">View All</a></span></div>');
+
+          $('.products_number').append( data.results_count );
+
+          resultsLists.fadeIn(100);
+
+        });
+        
+      }
+      
+    };
+    
+    
+    function restSearch(termPages) {
+      
+      var form = $('#articles-search-results');
+      var resultsList = form.find('.search-results-articles');
+
+      if (termPages.length > 3 && termPages != $(this).attr('data-old-term')) {
+        
+        //$('.view-all-search-articles').empty();
+        $('.articles_number').empty();
+        
+        // Saving old query.
+        $(this).attr('data-old-term', termPages);
+        
+        currentAjaxRequest = $.getJSON(termPages + '&view=json', function(data) {          
+
+            resultsList.empty();
+
+            var coun = 0;
+            $.each(data.results, function(index, item) {
+              coun++
+
+              if ( coun == 10 ) {
+                var link = $('<a></a>').attr('href', item.url);
+                link.append('<span>' + coun + item.title + '</span>');
+                link.wrap('<li class="results"></li>');
+                resultsList.append(link.parent() , '<li class="results">...</li>');
+              } else {
+                var link = $('<a></a>').attr('href', item.url);
+                link.append('<span>' + item.title + '</span>');
+                link.wrap('<li class="results"></li>');
+                resultsList.append(link.parent());
+              }
+              
+            });
+
+            //$('.view-all-search-articles').append('<div><span class="title"><a href="' + termPages + '">Articles (' + data.results_count + ')</a></span><span class="view-all"><a href="' + termPages + '">View All</a></span></div>');
+
+            $('.articles_number').append( data.results_count );
+
+            resultsList.fadeIn(100);
+          });
+        
+      }
+      
+    };  
+    
+    // Listening to keyup and change on the text field within these search forms.
+    input.attr('autocomplete', 'off').bind('keyup change', function() {
+      
+      var term = $(this).val();
+      var termProduct = '/search?type=product&q=' + term;
+      var termPages = '/search?type=article,page&q=' + term;
+      
+      prodSearch(termProduct);
+      restSearch(termPages);
+      
+    });
+    
+  /*});
+  // Clicking outside makes the results disappear.
+  $('body').bind('click', function(){ $('.search-results').hide(); });
+  */
+  
+});
+</script>
+
+
+<style>
+  
+
+  
+</style>

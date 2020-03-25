@@ -1,0 +1,186 @@
+<!-- /templates/page.liquid -->
+<div class="grid">
+  <div class="grid__item large--five-sixths push--large--one-twelfth">
+
+    <header class="section-header text-center">
+      <h1>{{ page.title }}</h1>
+    </header>
+
+    <div class="grid">
+      <div class="grid__item large--four-fifths push--large--one-tenth">
+        <div class="rte rte--nomargin rte--indented-images">
+          {{ page.content }}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+  <div class="container cf">
+      <div class="user-content row-spacing {% if settings.lightbox_imgs %}lightboximages{% endif %}">
+        
+        <!-- Div to show the loading text while the iframe loading is in progress
+        ========================================================================= -->
+        <div class="sixteen columns clearfix" style=" width:100%;height:500px; text-align:center; " align="center" id="loading">Loading......</div>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.3/iframeResizer.min.js"></script>
+        <iframe style="display:none; min-height:1000px;" name="icIframe" id="icIframe" src="" frameborder="0" align="center" width="100%" scrolling="auto" height="1000">Your Browser Does Not Support iFrames</iframe>   
+        <!-- Ic form to build store's cart content
+        ============================================= -->
+        <form name="icForm" id="icForm" method="post" action="https://www.internationalcheckout.com/cart.php" target="icIframe">
+            {% for item in cart.items %}  
+
+            {% if item.title contains 'Gift Card' %}
+                <input id="giftCard" name="giftCard" class="giftCard" type="hidden" value="1" />
+            {% endif %}
+
+            {% comment %} START CODE FOR RESTRICTED ITEM {% endcomment %}
+
+            {% include 'blocked_from_ic' %}
+            {% assign tag_found = false %}
+            {% for tag in item.product.tags %}
+                {% if blocked_from_ic_tags contains tag %}
+                    {% assign tag_found = true %}
+                {% endif %}
+            {% endfor %}
+
+
+            {% if blocked_from_ic_ids_skus contains  item.product_id or blocked_from_ic_ids_skus contains item.sku or blocked_from_ic_ids_skus contains item.variant_id or blocked_from_ic_ids_skus contains item.variant.sku or tag_found == true %}
+                <input id="restrictedItem-{{ forloop.index }}" name="restricted-item" class="restricted-item" type="hidden" value="1" data-title="{{item.title}}" />
+            {% endif %}
+            {% comment %} END CODE FOR RESTRICTED ITEM {% endcomment %} 
+
+            {% if item.product.description !=  empty %}
+                <input type="hidden" class="ItemDescription" id="ItemDescription{{ forloop.index }}" name='ItemDescription{{ forloop.index }}' value="{{ item.title | replace: '"', '&acute;&acute;' | escape}} " />
+            {% else %}
+                <input type="hidden" class="ItemDescription" id="ItemDescription{{ forloop.index }}" name='ItemDescription{{ forloop.index }}' value="{{ item.title | replace: '"', '&acute;&acute;' | escape }}" />
+            {% endif %}
+            <input type="hidden" name="ItemImage{{ forloop.index }}" class="ItemImage" value='https:{{ item | img_url: 'compact' }}' />
+            <input type="hidden" name="ItemQuantity{{ forloop.index }}" value="{{ item.quantity }}" />
+            <input type="hidden" name="ItemPrice{{ forloop.index }}" value='{{ item.price | money | strip_html | replace: "$", "" }}' />
+            <input type="hidden" name="ItemSKU{{ forloop.index }}" value='{{item.variant.sku }}' />
+
+            {% endfor %}
+
+
+            <!-- Replace 'test' with your store's p value
+            ============================================= -->
+            <input type="hidden" name="p" value="undefeated" />
+
+            <input type="hidden" name="shipping_method" id="shipping_method" value="" />
+
+            <!-- For Flat Rate Shipping charges, add the amount in 'value' attribute
+            ============================================= -->
+            <input type="hidden" name="external_domesticshipping" id="external_domesticshipping" value="" />
+
+        </form>
+
+
+        <!-- Set a status in the case of empty cart 
+        ============================================= -->
+        {% if cart.item_count == 0 %}
+                <input type="hidden" id="cartStatus" value="1" />
+        {% endif %}
+
+
+        <!-- Display link back to home page in the case of empty cart 
+        ============================================= -->
+        <p id="noItem" style="display: none;height: 400px;text-align: center;padding: 50px;" >Your shopping cart is empty. <a href="/" >Continue Shopping</a></p>
+
+        <!-- Load jQuery to perform Javascript functionality
+        ================================================ -->
+        <script type="text/javascript">
+          var name = "";  var price;  var index = 1;  var host; var name = [];  var price = [];
+          $( document ).ready( function () {
+              if( document.getElementById( 'cartStatus' ) ){
+                  document.getElementById( 'noItem' ).style.display = '';
+              }else if( $( ".giftCard" ) && $( ".giftCard" ).val() == '1' ){
+                  alert( 'Gift Certificate is not available for international orders. Please remove Gift Certificate from shopping cart before proceeding with International Checkout.' ); 
+                  window.location.href = '/cart'; 
+              }else if( $( ".restricted-item" ) && $( ".restricted-item" ).val() == '1' ){
+                  alert( "The Following Item \n" + $( ".restricted-item" ).data('title') + "\nis not available for international orders. Please remove This item from shopping cart before proceeding with International Checkout." );           
+                window.location.href = '/cart'; 
+                {% comment %} THIS ABOVE ELSE IF CONDITION FOR RESTRICTED ITEM {% endcomment %}
+              }else{    
+                  makeform();
+              }
+          });
+          //*****************************************************************************************************//
+          //      Function to get shipping charges from /cart/shipping_rates.json, a page by Shopify         //
+          //*****************************************************************************************************//
+          function makeform() {
+
+              var url = '/cart/shipping_rates.json?shipping_address[zip]=91406&shipping_address[country]=United States&shipping_address[province]=California';
+              var currentUrl = window.location.href;
+              var urlAux = currentUrl.split('/' );
+              host = urlAux[ 2 ];
+              jQuery.support.cors = true;
+              jQuery.ajax({
+                  type: "GET",
+                  url: url,
+                  crossDomain:true,
+                  async: false,
+                  cache:false,
+                  beforeSend: function( x ) {
+                      if(x && x.overrideMimeType) {
+                          x.overrideMimeType( "application/j-son;charset=UTF-8" );
+                      }
+                  },
+                  dataType: "text",
+                  success: function( data ){
+                      var json = eval( '(' + data + ')' );
+                      if (json && json[ 'shipping_rates' ] && json[ 'shipping_rates' ][ 0 ] && json[ 'shipping_rates' ][ 0 ][ 'name' ] ) {
+                          ShippingRates = json[ 'shipping_rates' ];
+                          for ( var i in ShippingRates ) {
+                              ShippingRate = ShippingRates[ i ];
+                              getShippingRateDetailsResponse( ShippingRate );
+                          }
+                      }
+                  },
+                  error:function () {
+                      return false;
+                  }
+              });
+          }
+
+          function getShippingRateDetailsResponse( response ) {
+              if( response[ 'name' ] != '' ){
+                  name[ index-1 ] = response[ 'name' ];
+                  price[ index-1 ] = response[ 'price' ];
+
+                  if ( index == ShippingRates.length ) {
+                      sortedArray = price.sort( function( a,b ){ return a - b } );    // Sort the shipping price from low to high.
+                      // Find the index of low price in the array
+                      for( var k = 0;  k < sortedArray.length; k++ ){
+                          if( sortedArray[ 0 ] == price[ k ] ){
+                              break;
+                          }
+                      }
+                      shipping_method = name[ k ];  
+                      shipping_price = price[ k ];
+
+                      $( "#external_domesticshipping" ).val( shipping_price );
+                      $( "#shipping_method" ).val( shipping_method );
+
+                      //-- Iframe to load Ic cart landing page
+                      //===========================================
+                      document.getElementById( 'icForm' ).submit();
+
+                      jQuery('#icIframe').load(function() {
+                          jQuery("#icForm").remove();// Remove Ic for for security
+                          jQuery("#loading").css("display","none");// Don't display the loading text now as Ic iframe has been loaded now.
+                          jQuery('#icIframe').fadeIn();
+                      });
+                      iFrameResize({
+                          checkOrigin   : false,
+                          enablePublicMethods     : true,                  // Enable methods within iframe hosted page
+                      });          
+                  }
+                  index++;
+              }
+          }
+        </script>
+        
+      </div>
+  </div>

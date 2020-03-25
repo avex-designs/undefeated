@@ -1,0 +1,170 @@
+<!-- /templates/customers/account.liquid -->
+{% comment %}
+
+  For all available customer liquid tags:
+    - http://docs.shopify.com/themes/liquid-variables/customer
+
+{% endcomment %}
+
+{% paginate customer.orders by 20 %}
+ {% comment %}
+<header class="section-header text-center">
+  <h1>{{ 'customer.account.title' | t }}</h1>
+  {{ 'layout.customer.log_out'| t | customer_logout_link }}
+</header>
+{% endcomment %}
+
+
+<div id="Account_Page_content">
+
+    <div class="grids">
+      
+      <div class="tab-container acct-info" id="tab1C">
+        <h3 class="mar-bot">Account Information</h3>
+  
+        <p><strong>{{ 'customer.addresses.default' | t }}</strong></p>
+        {{ customer.default_address | format_address }}
+
+        {% for address in customer.addresses %}
+          {% if address == customer.default_address %}
+            
+          {% else %}
+            {{ address | format_address }}
+          <p>
+            {{ 'customer.addresses.delete' | t | delete_customer_address_link: address.url }}
+          </p>
+          {% endif %}
+        {% endfor %}
+      </div><!-- tab-container -->
+
+      
+      <!--<div class="tab-container acct-info" id="tab1C">
+        <h3 class="mar-bot">Account Information</h3>
+  
+        <p><strong>{{ 'customer.addresses.default' | t }}</strong></p>
+        {{ customer.default_address | format_address }}
+
+        {% for address in customer.addresses %}
+          {% if address == customer.default_address %}
+            
+          {% else %}
+            {{ address | format_address }}
+          <p>
+            {{ 'customer.addresses.delete' | t | delete_customer_address_link: address.url }}
+          </p>
+          {% endif %}
+
+        {% endfor %}
+        {% comment %} <p><a href="{{ routes.account_addresses_url }}" class="text-link">{{ 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})</a></p> {% endcomment %}
+      </div><!-- tab-container -->
+
+      <div class="tab-container" id="tab2C">
+        {% comment %}<h2 class="h3">{{ 'customer.orders.title' | t }}</h2>{% endcomment %}
+          {% for order in customer.orders %}
+            {% include 'account-orders' %}
+          {% endfor %}
+
+        {% comment %} If we have past orders, loop through each one 
+        {% if customer.orders.size != 0 %}
+          <div class="table-wrap">
+            <table class="full table--responsive">
+              <thead>
+                <tr>
+                  <th>{{ 'customer.orders.order_number' | t }}</th>
+                  <th>{{ 'customer.orders.date' | t }}</th>
+                  <th>{{ 'customer.orders.payment_status' | t }}</th>
+                  <th>{{ 'customer.orders.fulfillment_status' | t }}</th>
+                  <th>{{ 'customer.orders.total' | t }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in customer.orders %}
+                  <tr class="table__section">
+                    <td data-label="{{ 'customer.orders.order_number' | t }}">{{ order.name | link_to: order.customer_url }}</td>
+                    <td data-label="{{ 'customer.orders.date' | t }}">{{ order.created_at | date: format: 'date' }}</td>
+                    <td data-label="{{ 'customer.orders.payment_status' | t }}">{{ order.financial_status_label }}</td>
+                    <td data-label="{{ 'customer.orders.fulfillment_status' | t }}">{{ order.fulfillment_status_label }}</td>
+                    <td data-label="{{ 'customer.orders.total' | t }}">{{ order.total_price | money }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %} <p>{{ 'customer.orders.none' | t }}</p>  {% endif %}
+        {% endcomment %}
+        
+      </div><!-- tab-container -->
+
+      <div class="tab-container" id="tab3C">
+        
+        {% include 'account-addresses' %}
+
+      </div><!-- tab-container -->
+
+    </div> <!-- grids -->
+
+
+    <div class="tabs-select-container">
+
+      <ul id="tabs" class="accounts-select">
+          <li>
+            <a id="tab1"> account details </a>
+          </li>
+          <li>
+            <a id="tab2"> order history </a>
+          </li>
+          <li>
+            <a id="tab3">shipping addresses </a>
+          </li>
+          <li>
+            <a id="nil">{{ 'layout.customer.log_out'| t | customer_logout_link }}</a>
+          </li>
+      </ul>
+
+      <select id="tabs_select">
+          <option id="tab1"> account details </option>
+          <option id="tab2"> order history </option>
+          <option id="tab3">shipping addresses </option>
+          <option id="nil">{{ 'layout.customer.log_out'| t | customer_logout_link }}</option>
+      </select>
+      
+    </div>
+
+
+</div>
+
+<script>  
+$(document).ready(function() {
+
+  $('#tabs li a:not(:first)').addClass('inactive');
+  $('.tab-container').hide();
+  $('.tab-container:first').show();
+
+  $('#tabs li a').click(function(){
+      var t = $(this).attr('id');
+      if($(this).hasClass('inactive')){ //this is the start of our condition 
+        $('#tabs li a').addClass('inactive');
+        $(this).removeClass('inactive');
+        
+        $('.tab-container').hide();
+        $('#'+ t + 'C').fadeIn('slow');
+     }
+  });
+
+  $('#tabs_select').change(function(){
+
+      $('.colors').hide();
+      $('#' + $(this).val()).show();
+
+  });
+
+});
+</script>
+
+
+
+
+{% if paginate.pages > 1 %}
+  {% include 'pagination' %}
+{% endif %}
+{% endpaginate %}

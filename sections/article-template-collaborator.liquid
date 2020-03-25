@@ -1,0 +1,176 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" integrity="sha256-UhQQ4fxEeABh4JrcmAJ1+16id/1dnlOEVCFOxDef9Lw=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" integrity="sha256-kksNxjDRxd/5+jGurZUJd1sdR2v+ClrCl3svESBaJqw=" crossorigin="anonymous" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" integrity="sha256-pTxD+DSzIwmwhOqTFN+DB+nHjO4iAsbgfyFq5K5bcE0=" crossorigin="anonymous"></script>
+
+<!-- /templates/article-collaborators.liquid -->
+
+<div class="grids">
+  <article class="grid__items article-collab" itemscope itemtype="http://schema.org/Article">
+
+    <div class="grids top-col-imgs">
+
+      <header class="section-header mob-1">
+        <h1>{{ article.title }}</h1>
+      </header>
+
+      <div class="article-fetured-img">
+          {{ article.image.url }}
+          {%- assign img_url = article.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          <img class="article--image lazyload {{ img_id_class }}"
+             data-src="{{ img_url }}"
+             data-widths="[180, 370, 590, 740, 900, 1080, 1296, 1512, 1728, 2048]"
+             data-aspectratio="{{ product.featured_image.aspect_ratio }}"
+             data-sizes="auto"
+             alt="{{ product.featured_image.alt | escape }}"
+             data-image>
+      </div>
+
+      <div class="content half mob-3" itemprop="articleBody"> {{ article.content }} </div>
+
+    </div>
+
+    <section class="Collab_products_wrapper">
+    <div id="Collab_products" class="grids">
+      {% assign selected_handleszor = collections[article.metafields.collab.collection_select].handle %}
+      {% assign count = 0 %}
+      {% for product in collections[selected_handleszor].products %}
+        {% assign count = count | plus: 1 %}
+      <div class="item">
+          {%- assign img_url = product.featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          <div class="grid-product__image-wrapper">
+
+            <a class="grid-product__image-link{% unless product.featured_image.src == blank %} grid-product__image-link--loading{% endunless %}" href="{{ product.url }}" data-image-link>
+              {% if product.featured_image.src == blank %}
+              <div id="{{ img_wrapper_id }}" class="product--wrapper">
+                  <div style="padding-top:150%;">
+                <img class="grid-product__image product--image" src="{{ product.featured_image.src | img_url: '1024x' }}" alt="{{ product.featured_image.alt | escape }}">
+                </div>
+              </div>
+              {% else %}
+                {% comment %} { include 'image-style' with image: product.featured_image, small_style: true, width: width, height: height, wrapper_id: img_wrapper_id, img_id_class: img_id_class } {% endcomment %}
+                <div id="{{ img_wrapper_id }}" class="product--wrapper">
+                  <div style="padding-top:150%;">
+                    <img class="product--image lazyload {{ img_id_class }}"
+                         data-src="{{ img_url }}"
+                         data-widths="[180, 370, 590, 740, 900, 1080, 1296, 1512, 1728, 2048]"
+                         data-aspectratio="{{ product.featured_image.aspect_ratio }}"
+                         data-sizes="auto"
+                         alt="{{ product.featured_image.alt | escape }}"
+                         data-image>
+                  </div>
+                </div>
+                <noscript>
+                  <img class="grid-product__image" src="{{ product.featured_image.src | img_url: '1024x' }}" alt="{{ product.featured_image.alt | escape }}">
+                </noscript>
+              {% endif %}
+
+            </a>
+            {% if sold_out %}
+              <div class="grid-product__sold-out"> <p>{{ 'products.product.sold_out_html' | t }}</p> </div>
+            {% elsif on_sale %}
+              <div class="grid-product__on-sale">
+                {% capture saved_amount %}{{ product.compare_at_price | minus: product.price | money_without_trailing_zeros }}{% endcapture %}
+                <p>{{ 'products.general.save_html' | t: saved_amount: saved_amount }}</p>
+              </div>
+            {% endif %}
+          </div>
+
+        <p class="prod-title"><a href="{{ product.url }}">{{ count }}. {{ product.title }} </a></p>
+      </div>
+      {% endfor %}
+    </div>
+    </section>
+
+    <div class="grids collab-bottom-image">
+      {% if article.metafields.collab.bottom_image %}
+      <div class="bot_img"> {{ article.metafields.collab.bottom_image | img_tag }} </div>
+      {% endif %}
+    </div>
+
+
+  </article>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  if ( $(window).width() < 991 ) {
+
+    $('#Collab_products').addClass('owl-carousel owl-theme');
+
+    var owl = $('#Collab_products').owlCarousel({
+        loop:true,
+        margin:18,
+        nav:false,
+        dots: true,
+        items: 2
+    });
+
+  } else {
+    $('#Collab_products').owlCarousel('destroy');
+    $('#Collab_products').removeClass('owl-carousel owl-theme');
+  }
+
+});
+</script>
+
+{% comment %}
+<hr class="hr--medium hr--clear">
+<div class="text-center">
+  <a href="{{ blog.url }}" class="return-link">&larr; {{ 'blogs.article.back_to_blog' | t: title: blog.title }}</a>
+</div>
+{% endcomment %}
+
+
+{% schema %}
+{
+  "name": {
+    "da": "Artikelsider",
+    "de": "Artikelseiten",
+    "en": "Article pages",
+    "es": "Páginas del artículo",
+    "fi": "Artikkelisivut",
+    "fr": "Pages d'articles",
+    "hi": "लेख पेज",
+    "it": "Pagine articoli",
+    "ja": "記事ページ",
+    "ko": "문서 페이지",
+    "ms": "Halaman artikel",
+    "nb": "Artikkelsider",
+    "nl": "Artikelpagina's",
+    "pt-BR": "Páginas do artigo",
+    "pt-PT": "Páginas de artigo",
+    "sv": "Artikelsidor",
+    "th": "หน้าบทความ",
+    "zh-CN": "文章页面",
+    "zh-TW": "文章頁面"
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "social_sharing_blog",
+      "label": {
+        "da": "Vis knapper til deling på sociale medier",
+        "de": "Social-Sharing-Schaltflächen anzeigen",
+        "en": "Show social sharing buttons",
+        "es": "Mostrar botones para compartir en redes sociales",
+        "fi": "Näytä sosiaalisen median jakamispainikkeet",
+        "fr": "Afficher les boutons de partage social",
+        "hi": "सोशल शेयरिंग बटन दिखाएं",
+        "it": "Mostra i pulsanti per la condivisione sui social",
+        "ja": "ソーシャル共有ボタンを表示する",
+        "ko": "소셜 공유 버튼 표시",
+        "ms": "Tunjukkan butang perkongsian sosial",
+        "nb": "Vis knapper for deling på sosiale medier",
+        "nl": "Knoppen voor sociaal delen weergeven",
+        "pt-BR": "Exibir botões de compartilhamento em redes sociais",
+        "pt-PT": "Mostrar botões de partilha nas redes sociais",
+        "sv": "Visa knappar för delning i sociala medier",
+        "th": "แสดงปุ่มสำหรับแชร์ลงโซเชียล",
+        "zh-CN": "显示社交分享按钮",
+        "zh-TW": "顯示社群分享按鈕"
+      },
+      "default": true
+    }
+  ]
+}
+{% endschema %}

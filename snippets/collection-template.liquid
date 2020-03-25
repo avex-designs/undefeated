@@ -1,0 +1,176 @@
+{% comment %}
+  Collection template, used on collection.liquid and collection.image.liquid
+{% endcomment %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.matchHeight/0.7.2/jquery.matchHeight-min.js" integrity="sha256-+oeQRyZyY2StGafEsvKyDuEGNzJWAbWqiO2L/ctxF6c=" crossorigin="anonymous"></script>
+
+{% paginate collection.products by 14 %}
+
+
+
+  <div class="grid-uniform_collection">
+
+    <div class="filter-div grid__item medium--one-whole large--one-quarter">
+        {% include 'filter-menu' %}
+    </div> 
+
+    <div  id="AjaxinateLoop">
+
+        {% assign grid_item_width = 'medium--one-half large--one-third' %}
+        
+        {% for product in collection.products %}
+            
+
+          {% for option in product.options %}
+             {% if option == 'Color' %}
+
+               {% assign index = forloop.index0 %}
+               {% assign colorlist = '' %}
+               {% assign color = '' %}
+               {% for variant in product.variants %}
+                  {% capture color %}  {{ variant.options[index] }}  {% endcapture %}
+
+                  {% unless colorlist contains color %}
+
+                    {% include 'product-grid-item' %}
+                    
+                    {% capture tempList %} {{colorlist | append: color | append: " " }} {% endcapture %}
+                  
+                    {% assign colorlist = tempList %}
+                  {% endunless %}
+                {% endfor %}
+
+              {% endif %}
+          {% endfor %}
+        
+        {% else %}
+        
+          {% if collection.handle == 'all' %}
+            {% comment %} Add default products to help with onboarding for collections/all only {% endcomment %}
+            {% include 'onboarding-featured-products' %}
+          {% else %}
+            {% comment %} If collection exists but is empty, display message {% endcomment %}
+            <div class="grid__item text-center">
+              <p>{{ 'collections.general.no_matches' | t }}</p>
+            </div>
+          {% endif %}
+        
+        {% endfor %}
+
+    </div>
+
+  </div>
+
+
+     <div id="AjaxinatePagination">
+      {% if paginate.next %}
+        <a href="{{ paginate.next.url }}">Loading More</a>
+      {% endif %}
+    </div>
+{% endpaginate %}
+
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function() {
+  var endlessScroll = new Ajaxinate();
+});
+
+$(function() {
+
+  $('.product_wrap').matchHeight({
+      byRow: false,
+      property: 'height',
+      target: null
+  });
+
+  var init_array = []
+
+  $('#Brands').addClass('banana');
+  $('[data-attr="Brands"]').addClass('select');
+
+
+  $('.filter-group h4').click(function(){
+
+      let new_added_filter_id = $(this).attr("data-attr");
+      localStorage.setItem("previous_new_added_filter_id", new_added_filter_id);
+      console.log( "on click - new_added_filter_id:")
+      console.log( new_added_filter_id);
+
+      if ( init_array.includes(new_added_filter_id) ) {
+        var index = 1;
+        console.log(new_added_filter_id);
+        init_array.splice(new_added_filter_id);
+      } else {
+        init_array.push(new_added_filter_id);
+      }
+      //console.log("on click - init_array:");    console.log(init_array);
+
+      localStorage.setItem("init_array_Stored", init_array);
+      //console.log("on click - init_array_Stored:");   console.log(init_array_Stored);
+
+      var init_array_Stringified = JSON.stringify(init_array);
+      localStorage.setItem("init_array_Stringified", init_array_Stringified);
+      //console.log("on click - init_array_Stringified:");    console.log(init_array_Stringified);
+
+      var new_array = JSON.parse(init_array_Stringified);
+      console.log("on click - new_array:");
+      console.log(new_array);
+
+
+      let banana = $(this).parent().find('.scroll-content');
+      //let clear = $(this).parent().find('.filter-clear');
+      if ( banana.hasClass('banana') ) {
+          //clear.addClass('hide');
+
+          $(this).removeClass('select');
+
+          banana.removeClass('banana');
+          banana.slideUp('200');
+          
+      } else {
+        //clear.removeClass('hide');
+
+         $(this).addClass('select');
+
+         banana.addClass('banana');
+         banana.slideDown({
+            start: function () {
+              $(this).css({
+                display: "block"
+              })
+            }
+          });
+         
+      }
+  });
+
+  var previous_new_added_filter_id = localStorage.getItem('previous_new_added_filter_id');
+  var init_array_Stored = localStorage.getItem('init_array_Stored');
+  var init_array_Stringified = localStorage.getItem('init_array_Stringified');
+
+  //console.log("page load - previous_new_added_filter_id:");   console.log(previous_new_added_filter_id);
+  //console.log("page load - init_array:");   console.log(init_array);
+  //console.log("page load - init_array_Stored (string) :");    console.log(init_array_Stored);
+
+  var new_array_STORED = JSON.parse(init_array_Stringified);
+  console.log("page load - new_array_STORED:");
+  console.log(new_array_STORED);
+
+  if ( new_array_STORED != null ) {
+    //alert('non e nil');
+    init_array = new_array_STORED;
+  
+    new_array_STORED.forEach(function(value){ 
+      //console.log(value);
+      //$('h4[data-attr= '+value+']').parent().find('.filter-clear').removeClass('hide');
+      $('h4[data-attr= '+value+']').addClass('select');
+      $('#' + value).addClass('banana');
+      $('#' + value).css('display','block');
+    });
+    
+  }
+
+
+});
+</script>
+
+

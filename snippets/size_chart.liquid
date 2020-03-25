@@ -1,0 +1,50 @@
+<h2>{{ product.metafields.product.size_chart_title }}</h2>
+
+<div class="size_chart_container">
+
+	<div class="first_col">
+		<div class="size_description">
+			{% for value in product.metafields.product.size_chart_description %}
+			{% assign bolded = product.metafields.product.bold[forloop.index0] | split: ", " %}
+			<div class="size_chart_row {% for bold in bolded %}{% if bold %} bold {% endif %}{% endfor %}">
+				<span>
+					{{ value }}
+				</span>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+
+	<div class="second_col">
+		{% for value in product.metafields.product.size_chart_description %}
+		{% assign sizes = product.metafields.product.size_chart_values[forloop.index0] | split: ", " %}
+		{% assign bolded = product.metafields.product.bold[forloop.index0] | split: ", " %}
+		<div class="size_chart_row {% for bold in bolded %}{% if bold %} bold {% endif %}{% endfor %}">
+			<div class="size_numbers">
+				{% for size in sizes %}
+				<span> {{ size }}</span>
+				{% endfor %}
+			</div>
+		</div>
+		{% endfor %}
+
+	</div>
+
+	<div class="mobile_row">
+		{% for value in product.metafields.product.size_chart_description %}
+		{% assign sizes = product.metafields.product.size_chart_values[forloop.index0] | split: ", " %}
+		{% assign bolded = product.metafields.product.bold[forloop.index0] | split: ", " %}
+		<div class="size_chart_row {% for bold in bolded %}{% if bold %} bold {% endif %}{% endfor %}">
+			<div class="mobile_title"> {{ product.metafields.product.size_chart_description[forloop.index0] }} </div>
+			<div class="size_numbers">
+				{% for size in sizes %}
+				<span> {{ size }}</span>
+				{% endfor %}
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+
+</div>
+
+<div class="size_chart_note">Size conversions vary per brand and may not fully match the converions shown above. If you are not sure about your size, please <a href="/pages/contact-us-1">contact us here</a>. </div>

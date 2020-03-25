@@ -1,0 +1,177 @@
+<!-- /templates/blog.liquid -->
+
+
+<div id="Locash_links">
+
+    <div>  
+        <h4>United States of America</h4>
+        <ul>
+          {% for value in page.metafields.location_anchor.store_title_usa %}
+          <li><a href="#{{ value | camelcase }}">{{ value }}</a></li>
+          {% endfor %}
+        </ul>
+    </div>
+
+    <div>  
+        <h4>JAPAN</h4>
+        <ul>
+          {% for value in page.metafields.location_link.store_title_japan %}
+          <li><a href="#{{ value | camelcase }}">{{ value }}</a></li>
+          {% endfor %}
+        </ul>
+    </div>
+
+    <div>
+        <h4>CHINA</h4>
+        <ul>
+          {% for value in page.metafields.location_link_china.store_title_china %}
+          <li><a href="#{{ value | camelcase }}">{{ value }}</a></li>
+          {% endfor %}
+        </ul>
+    </div>
+
+</div>
+
+<!--
+<select id="Locash_select">
+    <option value="all"> All Locations </option>
+    <option value="USA"> USA </option>
+    <option value="Japan"> Japan </option>
+    <option value="China">China </option>
+</select>
+-->
+
+
+	<div id="Blogs_select">
+      <span class="blog_init"> <span class="select_title selected">All Locations</span> <img src="{{ 'filter-down.svg' | file_url }}"/> </span>
+      	<div class="toggle_view closed">
+          	<span class="select" data="All Locations"> All Locations </span>
+        	<span class="select" data="USA"> USA </span>
+        	<span class="select" data="Japan"> Japan </span>
+        	<span class="select" data="China"> China </span>
+      	</div>
+    </div>
+
+
+<div id="articles_grid" class="grids">
+
+  <div class="grid__items">
+    
+    {% for value in page.metafields.location.store_title %}
+      <article id="{{page.metafields.location.store_title[forloop.index0] | camelcase }}" class="articles grids" data-attr="{{ page.metafields.location.store_country[forloop.index0] }}">
+
+
+        {% if page.metafields.location.store_image[forloop.index0].size > 0 %}
+
+        {% for map in page.metafields.location.store_map_link[forloop.index0] %}
+        {% if map.size > 0 %}
+        <a target="_blank" href="{{ map }}">
+        {% else %}
+        <div class="grid__items">
+        {% endif %}
+        {% endfor %}
+
+          <div class="article__featured-image-link">
+            <div class="article__featured-image-wrapper">
+              <img class="article__featured-imagezor lazyload"
+                src="{{ page.metafields.location.store_image[forloop.index0] }}"
+                data-src="{{ page.metafields.location.store_image[forloop.index0] }}"
+                data-widths="[360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                data-aspectratio="{{ page.metafields.location.store_image[forloop.index0].aspect_ratio }}"
+                data-sizes="auto"
+                alt="bah bah booie">
+            </div>
+          </div>
+
+        {% for map in page.metafields.location.store_map_link[forloop.index0] %}
+        {% if map.size > 0 %}
+        </a>
+        {% else %}
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        {% endif %}
+       
+     
+        <div class="grid__items">
+          <h2 class="h3"><span class="article__heading-link">{{ page.metafields.location.store_title[forloop.index0] }}</span></h2>
+          <div class="articles-desc">
+            {{ page.metafields.location.store_details[forloop.index0] }}
+            {% comment %}
+            {% for map in page.metafields.location.store_map_link[forloop.index0] %}
+            {% if map.size > 0 %}
+            <a target="_blank" href="{{ map }}">view map</a>
+            {% endif %}
+            {% endfor %}
+            {% endcomment %}
+          </div>
+        </div>
+
+      </article>
+    {% endfor %}
+
+  </div>
+
+
+</div>
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+    $('#Locash_select').change(function(){
+      var t = $(this).val();
+      if ( t == 'all' ) {
+          //alert('BANANA');
+          $('article.articles').fadeIn('slow');
+      } else {
+        $('article.articles').hide();
+        $('[data-attr='+ t +']').fadeIn('slow');
+      }
+  });
+  
+  
+    $('.blog_init').click(function(){
+    
+    if ( ! $('.toggle_view').hasClass('closed') ){
+    	$('.toggle_view').addClass('closed');
+    } else {
+    	$('.toggle_view').removeClass('closed');
+    }
+    
+  });
+  
+  
+    $('span.select').click( function(e){
+      
+	  /*event.preventDefault();
+	  event.stopPropagation();
+      $(this).closest(".toggle_view").find('.selected').removeClass('selected');
+      $(this).addClass('selected');*/
+      
+      var t = $(this).attr('data');
+      console.log(t);
+      
+      $('.select_title').html(t);
+      
+      if ( t == 'All Locations' ) {
+          //alert('BANANA');
+          $('article.articles').fadeIn('slow');
+      } else {
+        $('article.articles').hide();
+        $('[data-attr='+ t +']').fadeIn('slow');
+      }
+    
+    });
+
+});
+</script>
+
+
+{% schema %}
+{
+  "name": "Locations Feed",
+  "settings": [ ]
+}
+{% endschema %}

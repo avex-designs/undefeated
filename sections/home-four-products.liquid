@@ -1,0 +1,58 @@
+<section id="home-four-project">
+{% for product in collections.frontpage.products limit:4 %}
+
+	{% include 'product-grid-item' %}
+
+{% endfor %}
+</section>
+
+{% schema %}
+  {
+    "name": "Home - Featured",
+	"blocks": [
+	  {
+        "type": "introduction",
+        "name": "Products - Intro",
+        "settings": [
+	      {
+            "type": "product",
+            "id": "product-1",
+            "label": "Product 1"
+          },
+			{
+            "type": "product",
+            "id": "product-2",
+            "label": "Product 2"
+          },
+			{
+            "type": "product",
+            "id": "product-3",
+            "label": "Product 3"
+          },
+			{
+            "type": "product",
+            "id": "product-4",
+            "label": "Product 4"
+          }
+        ]
+      }
+    ],
+	"presets": [
+      {
+        "name": "Home - Featured",
+        "category": "Home",
+        "blocks": [
+          {
+            "type": "introduction"
+          }
+        ]
+      }
+	]
+  }
+{% endschema %}
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

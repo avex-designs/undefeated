@@ -1,0 +1,233 @@
+  <div class="drawer__inner drawer-left__inner">
+    
+    
+    <div class="header_content_container">
+            
+      <div class="header_logo_wrap">
+        {% if template.name == 'index' %}
+          <h1 class="site-header__logo large--left" itemscope itemtype="http://schema.org/Organization">
+        {% else %}
+          <div class="h1 site-header__logo large--left" itemscope itemtype="http://schema.org/Organization">
+        {% endif %}
+          {% if section.settings.logo_max_width != blank %}
+            {% capture image_size %}{{ section.settings.logo_max_width | escape }}x{% endcapture %}
+          {% else %}
+            {% assign image_size = "180x" %}
+          {% endif %}
+
+          {% if template.name == 'index' %}
+            <a href="/" itemprop="url" class="site-header__logo-link hide-tab">
+              <img src="{{ 'undefeated-logo-icon.svg' | file_url }}" />
+            </a>
+          {% else %}
+            <a href="/" itemprop="url" class="site-header__logo-link hide-tab">
+              <img src="{{ 'undefeated-logo-icon.svg' | file_url }}" />
+            </a>
+          {% else %}
+            <a href="/" itemprop="url">{{ shop.name }}</a>
+          {% endif %}
+        {% if template.name == 'index' %}
+          </h1>
+        {% else %}
+          </div>
+        {% endif %}
+      </div> <!-- // header logo wrap -->
+    
+      <div class="desk--hide">
+        <div class="mob-first-row">
+
+          <a href="/search" class="site-nav__link site-nav__link--icon{% if search_modal %} js-toggle-search-modal{% endif %}" data-mfp-src="#SearchModal">
+            <span class="icon-fallback-text">
+              <img src="{{ 'search.svg' | file_url }}" alt="search icon">
+              <!--<span class="icon icon-search" aria-hidden="true"></span>-->
+              <span class="fallback-text">{{ 'general.search.title' | t }}</span>
+            </span>
+          </a><!-- search -->
+
+          {% comment %}<a href="/cart" class="site-nav__link cart-link js-drawer-open-button-right" aria-controls="CartDrawer">{% endcomment %}
+            <a class="site-nav__link site-nav__link--icon cart-link load-cart-drawer {% if cart.item_count > 0 %} bold {% endif %}">
+              <span class="cart-item-count">( {{ cart.item_count }} )</span>
+                <span class="icon-fallback-text">
+                  <span class="fallback-text">{{ 'layout.cart.title' | t }}</span>
+                </span>
+            </a>
+              {% comment %}
+              <a href="/cart" class="site-nav__link cart-link site-nav__link--icon {% if cart.item_count > 0 %} bold {% endif %}">
+                <span class="icon-fallback-text">
+                  <span class="cart-item-count">( {{ cart.item_count }} )</span>
+                  <!--<span class="icon icon-cart" aria-hidden="true"></span>-->
+                  <span class="fallback-text">{{ 'layout.cart.title' | t }}</span>
+                </span>
+                
+              </a><!-- cart -->
+              {% endcomment %}
+
+            <button type="button" class="site-nav__link--burger icon-fallback-text drawer__close-button js-drawer-close" aria-controls="NavDrawer" aria-expanded="false">
+              <span class="burger-icon burger-icon--top"></span>
+              <span class="burger-icon burger-icon--bottom"></span>
+              <span class="fallback-text">Site navigation</span>
+            </button>
+
+        </div> <!-- / mob first row -->
+      </div> <!--// MOBILE NAV BUTTON -->
+    
+    
+    </div>
+
+
+    {% if section.settings.drawer_search_enable %}
+      {% include 'search-bar', search_btn_style: 'btn--secondary', search_bar_location: 'search-bar--drawer' %}
+    {% endif %}
+
+    <div id="banana">
+        <div id="CartDrawer_Drawer" class="wrappa-drawer">
+          
+       		
+            <div class="accounts_wrap">
+              {% comment %}
+              {% unless customer %}
+                {% include 'dropdown-login-drawer' %}
+              {% else %}
+
+                {% include 'dropdown-checkout-drawer' %}
+
+              {% endunless %}
+              {% endcomment %}
+            </div>
+      		
+
+            <div class="drop_50{% if customer %} be-logged{% endif %}">
+                <div class="cart_wrap">
+                  <div class="drawer__inner">
+                     
+                    <div id="CartContainer_Drawer" class="drawer__cart">
+                      <p class="cart--empty-message">Loading...</p>
+                    </div>
+                  </div>
+                </div><!-- cart wrap -->
+            </div>
+        </div><!-- #CartDrawer -->
+    </div> <!-- banana -->
+
+    <ul class="mobile-nav">
+      {% for link in linklists[section.settings.main_menu_link_list].links %}
+        {% if link.links != blank %}
+          <li class="mobile-nav__item">
+            <div class="mobile-nav__has-sublist">
+              <a
+                href="{{ link.url }}"
+                class="mobile-nav__link"
+                id="Label-{{ forloop.index }}"
+                {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>{{ link.title | escape }}</a>
+              <div class="mobile-nav__toggle">
+                <button type="button" class="mobile-nav__toggle-btn icon-fallback-text" aria-controls="Linklist-{{ forloop.index }}" aria-expanded="false">
+                  <span class="icon-fallback-text mobile-nav__toggle-open">
+                    <span class="icon icon-plus" aria-hidden="true"></span>
+                    <span class="fallback-text">{{ 'general.drawers.expand_submenu' | t }} {{ link.title | escape }}</span>
+                  </span>
+                  <span class="icon-fallback-text mobile-nav__toggle-close">
+                    <span class="icon icon-minus" aria-hidden="true"></span>
+                    <span class="fallback-text">{{ 'general.drawers.collapse_submenu' | t }} {{ link.title | escape }}</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+            <ul class="mobile-nav__sublist" id="Linklist-{{ forloop.index }}" aria-labelledby="Label-{{ forloop.index }}" role="navigation">
+              {% assign parent_index = forloop.index %}
+              {% for childlink in link.links %}
+                {% if childlink.links != blank %}
+                <li class="mobile-nav__item">
+                  <div class="mobile-nav__has-sublist">
+                    <a
+                      href="{{ childlink.url }}"
+                      class="mobile-nav__link"
+                      id="Label-{{ parent_index }}-{{ forloop.index }}"
+                      {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
+                        {{ childlink.title }}
+                    </a>
+                    <div class="mobile-nav__toggle">
+                      <button type="button" class="mobile-nav__toggle-btn icon-fallback-text" aria-controls="Linklist-{{ parent_index }}-{{ forloop.index }}" aria-expanded="false">
+                        <span class="icon-fallback-text mobile-nav__toggle-open">
+                          <span class="icon icon-plus" aria-hidden="true"></span>
+                          <span class="fallback-text">{{ 'general.drawers.expand_submenu' | t }} {{ link.title | escape }}</span>
+                        </span>
+                        <span class="icon-fallback-text mobile-nav__toggle-close">
+                          <span class="icon icon-minus" aria-hidden="true"></span>
+                          <span class="fallback-text">{{ 'general.drawers.collapse_submenu' | t }} {{ link.title | escape }}</span>
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                  <ul class="mobile-nav__sublist mobile-nav__subsublist" id="Linklist-{{ parent_index }}-{{ forloop.index }}" aria-labelledby="Label-{{ parent_index }}-{{ forloop.index }}" role="navigation">
+                    {% for grandchildlink in childlink.links %}
+                      <li class="mobile-nav__item">
+                        <a
+                          href="{{ grandchildlink.url }}"
+                          class="mobile-nav__link"
+                          {% unless template.name == 'index' %}{% if grandchildlink.active %}aria-current="page"{% endif %}{% endunless%}>
+                            {{ grandchildlink.title | escape }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </li>
+                {% else %}
+                <li class="mobile-nav__item">
+                  <a
+                    href="{{ childlink.url }}"
+                    class="mobile-nav__link"
+                    {% unless template.name == 'index' %}{% if childlink.active %}aria-current="page"{% endif %}{% endunless%}>
+                      {{ childlink.title | escape }}
+                  </a>
+                </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          </li>
+
+          {% else %}
+
+          <li class="mobile-nav__item">
+            <a
+              href="{{ link.url }}"
+              class="mobile-nav__link"
+              {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
+                {{ link.title | escape }}
+            </a>
+          </li>
+
+        {% endif %}
+      {% endfor %}
+      {% comment %}
+        Spacer element
+      
+      <li class="mobile-nav__spacer"></li>
+
+      {% comment %}
+        If customer accounts are enabled, provide login and create account links
+      {% endcomment %}
+      {% if shop.customer_accounts_enabled %}
+        {% if customer %}
+          <li class="mobile-nav__item mobile-nav__item--secondary">
+            <a href="{{ routes.account_url }}">{{ 'layout.customer.account' | t }}</a>
+          </li>
+          <li class="mobile-nav__item mobile-nav__item--secondary">
+            {{ 'layout.customer.log_out' | t | customer_logout_link }}
+          </li>
+        {% else %}
+          <li class="mobile-nav__item mobile-nav__item--secondary">
+            {{ 'layout.customer.log_in' | t | customer_login_link }}
+          </li>
+          <li class="mobile-nav__item mobile-nav__item--secondary">
+            {{ 'layout.customer.create_account' | t | customer_register_link }}
+          </li>
+        {% endif %}
+      {% endif %}
+      {% for link in linklists[section.settings.drawer_bottom_link_list].links %}
+        <li class="mobile-nav__item mobile-nav__item--secondary"><a href="{{ link.url }}">{{ link.title }}</a></li>
+      {% endfor %}
+      {% endcomment %}
+    </ul>
+    <!-- //mobile-nav -->
+  </div>
+

@@ -1,0 +1,110 @@
+<section id="home-hero">
+  <div id="hero_section">
+
+    {% for block in section.blocks %}
+    <div class="item {{ block.settings.text_color }}">
+
+      {% if block.settings.link %}
+      <a href="{{ block.settings.link }}" style="background-image:url({{ block.settings.image-picker | img_url: 'master' }})">
+      {% else %}      
+      <div style="background-image:url({{ block.settings.image-picker | img_url: 'master' }})">
+      {% endif %}
+        
+      	<img src="{{ block.settings.image-picker | img_url: 'master' }}" alt="{{ block.settings.image-picker.alt }}">
+        
+      {% if block.settings.link %}
+      </a>
+      {% else %}
+      </div> <!-- hero-wrap -->
+      {% endif %}
+      
+      <div class="hero-text">
+        {% if block.settings.link %}
+        <a href="{{ block.settings.link }}">
+        {% endif %}
+
+        <h2> {{ block.settings.title }} </h2>
+
+        {% if block.settings.link %}
+        </a>
+        {% endif %}
+      </div>
+
+    </div>
+    {% endfor %}
+    
+  </div>
+</section>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#hero_section').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: false
+    });
+  });
+</script>
+
+{% schema %}
+  {
+    "name": "Hero Slider",
+	"settings": [
+	],
+	"blocks": [
+      {
+        "type": "select",
+        "name": "Add Slide",
+        "settings": [
+          {
+			"id": "description",
+            "type": "text",
+            "label": "Description",
+            "default": "Description Here"
+          },
+		  {
+			"id": "title",
+            "type": "text",
+            "label": "Title",
+            "default": "Default title"
+          },
+		  {
+            "id": "link",
+            "type": "url",
+            "label": "Button link"
+          },
+		  {
+            "id": "image-picker",
+            "type": "image_picker",
+            "label": "Background Image"
+          },
+		  {
+            "id": "image-picker-mobile",
+            "type": "image_picker",
+            "label": "Mobile Background Image"
+          }
+        ]
+      }
+    ],
+	"presets": [
+		{
+    		"name": "Hero Slideshow",
+    		"category": "Home",
+			"blocks": [
+              { 
+                "type": "select"
+              }
+            ]
+		}
+	]
+  }
+{% endschema %}
+
+{% stylesheet %}
+
+
+{% endstylesheet %}
+
+{% javascript %}
+
+{% endjavascript %}

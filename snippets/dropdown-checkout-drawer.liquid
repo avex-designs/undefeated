@@ -1,0 +1,89 @@
+<div class="cart-action">
+    <div class="contl">
+      <h3>United States Customers</h3>
+      {% comment %}
+      {% if settings.shipping_us_advice != "" %} 
+      <p class="advice">{{ settings.shipping_us_advice }}</p>
+      {% endif %}
+      {% endcomment %}
+      <p>Launch products: Orders refused or returned as undeliverable when sent to the address provided by the customer deprives other customers of the oppertunity to purchase this product and therefore will be subject to a 20% restocking fee if returned.</p>
+      <p>Once an order is placed, the sale is final and cannot be altered or cancelled.</p>
+      <p>
+        <!--<input type="checkbox" id="checkout-terms" title="Click to agree to the terms and refund policy"/>-->
+        <label for="drawer_checkout-terms">
+          <input type="checkbox" id="drawer_checkout-terms" title="Click to agree to the terms and refund policy"/>
+          I agree to the <a href="/">terms and refund policy</a>
+        </label></p>
+      <button id="drawer_checkout-btn" type="submit" name="checkout"  class="btn-uppercase continue-shopping"> continue to <br>u.s. checkout </button>
+    </div>
+    {% if settings.checkout_show_international_checkout %}
+    <div class="intl">
+      <h3>International Customers</h3>
+      <div class="intl-checkboxes">
+        {% comment %}
+        {% if settings.shipping_intl_advice != "" %} 
+        <p class="advice">{{ settings.shipping_intl_advice }}</p>
+        {% endif %}
+        {% endcomment %}
+        <p>Once an order is placed, the sale is final and cannot be altered or cancelled.</p>
+        <p><input type="checkbox" id="drawer_checkout-terms-int" title="Click to agree to the terms and refund policy" />&nbsp;<label for="drawer_checkout-terms-int">I agree to the <a href="{{ terms_url }}">terms and refund policy</a></label></p>
+        <p><input type="checkbox" id="drawer_checkout-international" title="Click to agree to the international order terms"/>&nbsp;<label for="drawer_checkout-international">I understand that international orders are subject to duties and taxes</label></p>
+      </div>
+      <button id="drawer_checkout-int-btn"  class="btn-uppercase continue-shopping">Continue to <br>Global Checkout</button>
+    </div>
+    {% endif %}
+
+    {% comment %}
+    <div>                       
+        <button onclick="window.location='/collections/all'" class="btn btn-default btn-uppercase">{{ 'cart.general.continue_shopping' | t }}</button>
+    </div>
+    {% endcomment %}
+
+</div>
+
+
+    <script type="text/javascript">
+      
+      $(document).on('click', '#drawer_checkout-btn', function () {
+        if(document.getElementById('drawer_checkout-terms').checked) {
+          document.location = '/checkout';
+            } else {
+              alert("You must confirm that you agree to the terms & refund policy before proceeding");
+            }
+        return false;
+      });
+
+      $(document).on('click', '#drawer_checkout-int-btn', function () {
+        if(document.getElementById('drawer_checkout-terms-int').checked) {
+                if(document.getElementById('drawer_checkout-international').checked) {
+                 document.location = '/pages/international-checkout';
+                } else {
+            alert("You must confirm you are aware of the additional costs of international orders");
+                }
+            } else {
+              alert("You must confirm that you agree to the terms & refund policy before proceeding");
+            }
+        return false;
+      });
+
+    </script>
+    <script id="shipping-calculator-response-template" type="text/template">
+      <p id="shipping-rates-feedback" <% if (success) { %> class="success" <% } else { %> class="error" <% } %>>
+      <% if (success) { %>
+        <% if (rates.length > 1) { %> 
+        There are <%= rates.length %> shipping rates available for <%= address %>, starting at <%= rates[0].price %>.
+        <% } else if (rates.length == 1) { %>
+        There is one shipping rate available for <%= address %>.
+        <% } else { %>
+        We do not ship to this destination.
+        <% } %>
+      <% } else { %>
+        <%= errorFeedback %>
+      <% } %>
+      </p>
+      <ul id="shipping-rates">
+        <% for (var i=0; i<rates.length; i++) { %>
+        <li><%= rates[i].name %> at <%= rates[i].price %></li>
+        <% } %>
+      </ul> 
+    </script>

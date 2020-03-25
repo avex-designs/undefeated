@@ -1,0 +1,134 @@
+<!-- /templates/customers/account.liquid -->
+
+{% paginate customer.orders by 20 %}
+
+<div id="Account_Page_content">
+
+    <div class="grids">
+
+      <div class="tab-container acct-info" id="tab1C">
+        <h3 class="mar-bot">Account Information</h3>
+  
+        {% comment %}
+        <p><strong>{{ 'customer.addresses.default' | t }}</strong></p>
+        {{ customer.default_address | format_address }}
+        
+
+        {% for address in customer.addresses %}
+ 			{% if address == customer.default_address %}    
+            	{% include 'account-addresses-details' %}
+        	{% endif %}
+        	{% comment %} <p> {{ 'customer.addresses.delete' | t | delete_customer_address_link: address.url }} </p> {% endcomment %}
+        {% endfor %}
+        {% endcomment %}
+
+        
+        
+        {{ customer.default_address | format_address }}
+
+        {% for address in customer.addresses %}
+          {% if address == customer.default_address %}
+            
+          {% else %}
+            {{ address | format_address }}
+          <p>
+            {{ 'customer.addresses.delete' | t | delete_customer_address_link: address.url }}
+          </p>
+          {% endif %}
+        {% endfor %}
+      
+
+
+      </div><!-- tab-container -->
+
+      <div class="tab-container" id="tab2C">
+          {% for order in customer.orders %}
+            {% include 'account-orders' %}
+          {% endfor %}
+      </div><!-- tab-container -->
+
+      <div class="tab-container" id="tab3C">
+        {% include 'account-addresses' %}
+      </div><!-- tab-container -->
+
+    </div> <!-- grids -->
+
+
+    <div class="tabs-select-container">
+
+      <ul id="tabs" class="accounts-select">
+          <li>
+            <a id="tab1"> account details </a>
+          </li>
+          <li>
+            <a id="tab2"> order history </a>
+          </li>
+          <li>
+            <a id="tab3">shipping addresses </a>
+          </li>
+          <li>
+            <a id="nil">{{ 'layout.customer.log_out'| t | customer_logout_link }}</a>
+          </li>
+      </ul>
+
+      <select id="tabs_select">
+          <option value="tab1"> account details </option>
+          <option value="tab2"> order history </option>
+          <option value="tab3">shipping addresses </option>
+          <option value="nil">{{ 'layout.customer.log_out'| t | customer_logout_link }}</option>
+      </select>
+      
+    </div>
+
+
+</div>
+
+<script>
+$(document).ready(function() {
+
+  $('#tabs li a:not(:first)').addClass('inactive');
+  $('.tab-container').hide();
+  $('.tab-container:first').show();
+
+  $('#tabs li a').click(function(){
+
+      var t = $(this).attr('id');
+
+      if($(this).hasClass('inactive')) {
+
+        $('#tabs li a').addClass('inactive');
+        $(this).removeClass('inactive');
+        $('.tab-container').hide();
+        $('#'+ t + 'C').fadeIn('slow');
+     }
+
+  });
+
+  $('#tabs_select').change(function(){
+
+      var t = $(this).val();
+
+      if ( t == 'nil' ) {
+
+          url = '/account/logout'
+          window.location = url;
+
+      } else {
+
+        $('.tab-container').hide();
+        $('#'+ t + 'C').fadeIn('slow');
+
+      }
+
+  });
+
+});
+</script>
+
+
+
+
+{% if paginate.pages > 1 %}
+  {% include 'pagination' %}
+{% endif %}
+{% endpaginate %}

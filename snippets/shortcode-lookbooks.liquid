@@ -1,0 +1,46 @@
+{% capture lookbooks %}{% include 'shortcode-render' render:'action' %}{% endcapture %}
+{% case lookbooks %}
+    {% when 'new lookbooks' %}
+	{% capture _enable_slider %}{% include 'shortcode-render' render:'slider' %}{% endcapture %}
+    {% capture _auto_slide %}{% include 'shortcode-render' render:'auto-play' %}{% endcapture %}
+	{% assign _enable_slider = _enable_slider | downcase  %}
+	{% assign _auto_slide = _auto_slide | downcase  %}
+	{% assign _class = "margin-row" %}
+    {% assign _data_auto = 'data-auto-slide="no"' %}
+	{% if "yes" == _enable_slider %}{% assign _class = "look-slider swiper-wrapper" %}{% endif %}
+    {% if "yes" == _auto_slide %}{% assign _data_auto = 'data-auto-slide="yes"' %}{% endif %}
+<div class="lookbooks-wrapper {{_class}}">
+  <div class="bc-lookbooks lookbooks {{_class}}" {{_data_auto}}>
+    {% when 'end lookbooks' %}
+  </div>
+  {% if "yes" == _enable_slider %}
+    <!-- Add Pagination -->
+    <div class="swiper-pagination"></div>
+    <!-- Add Arrows -->
+    <div class="swiper-button-next swiper-button-white"></div>
+    <div class="swiper-button-prev swiper-button-white"></div>
+    {% endif %}
+</div>
+    {% when 'new look' %}
+<div class="{% if "yes" == _enable_slider %}swiper-slide {% endif %}look-item {% include 'shortcode-render' render:'size' default:'' %}" style="background-image:url('{% include 'shortcode-render' render:'background' default:'#fff' %}');"><img src="{% include 'shortcode-render' render:'background' default:'#fff' %}" alt="">
+    {% when 'end look' %}
+</div>
+    {% when 'new point' %}
+
+	  {% capture _handle %}{% include 'shortcode-render' render:'handle' %}{% endcapture %}   
+	  {% assign _product = all_products[_handle] %}
+  
+<div class="look-point" style="top:{% include 'shortcode-render' render:'top' default:'48%' %};left:{% include 'shortcode-render' render:'left' default:'48%' %}" >
+     <div class="look-info">
+        <div class="look-product-image">
+        	<a href="{{_product.url}}" title="{{_product.title}}" ><img alt="{{ _product.title }}" src="{{ _product.featured_image.src | product_img_url: 'compact' }}" /></a>
+        </div>
+        <div class="look-product-name">
+            <a href="{{_product.url}}" title="{{_product.title}}" >{{_product.title}}</a>
+         </div>
+    </div>
+
+</div>
+
+    {% else %}
+  {% endcase %}

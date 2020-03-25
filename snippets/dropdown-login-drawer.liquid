@@ -1,0 +1,146 @@
+<div class="grids">
+
+  <div class="grid__items">
+
+    <div class="note form-success" id="ResetSuccess" style="display:none;">
+      {{ 'customer.recover_password.success' | t }}
+    </div>
+
+    <div id="CustomerLoginForm" class="form-vertical">
+      {% form 'customer_login' %}
+
+        {{ form.errors | default_errors }}
+
+        <label for="CustomerEmail" class="hidden-label">{{ 'customer.login.email' | t }}</label>
+        <input type="email" name="customer[email]" id="CustomerEmail" class="input-full{% if form.errors contains 'email' %} error{% endif %}" placeholder="{{ 'customer.login.email' | t }}" autocorrect="off" autocapitalize="off" autofocus>
+
+        {% if form.password_needed %}
+          <label for="CustomerPassword" class="hidden-label">{{ 'customer.login.password' | t }}</label>
+          <input type="password" value="" name="customer[password]" id="CustomerPassword" class="input-full{% if form.errors contains 'password' %} error{% endif %}" placeholder="{{ 'customer.login.password' | t }}">
+        {% endif %}
+      
+		<div class="login-btn-wrap">
+        <p>
+          <input type="submit" class="btn-account" value="Login">
+        </p>
+        {% if form.password_needed %}
+          <p><a href="#recover" id="RecoverPassword">{{ 'customer.login.forgot_password' | t }}</a></p>
+        {% endif %}
+      	</div>
+
+      {% endform %}
+    </div>
+
+
+    <div id="RecoverPasswordForm" style="display: none;">
+
+      <h2>{{ 'customer.recover_password.title' | t }}</h2>
+      <p>{{ 'customer.recover_password.subtext' | t }}</p>
+
+      <div class="form-vertical">
+        {% form 'recover_customer_password' %}
+
+          {{ form.errors | default_errors }}
+
+          {% comment %} Assign variable to be used after timber.init() is run in theme.liquid {% endcomment %}
+          {% if form.posted_successfully? %}
+            {% assign resetPassword = true %}
+          {% endif %}
+
+          <label for="RecoverEmail" class="hidden-label">{{ 'customer.recover_password.email' | t }}</label>
+          <input type="email" value="" name="email" id="RecoverEmail" class="input-full" placeholder="{{ 'customer.recover_password.email' | t }}" autocorrect="off" autocapitalize="off">
+
+          <p>
+            <input type="submit" class="btn-account" value="{{ 'customer.recover_password.submit' | t }}">
+          </p>
+          <button type="button" id="HideRecoverPasswordLink" class="btn-account">{{ 'customer.recover_password.cancel' | t }}</button>
+        {% endform %}
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<div class="grids">
+
+  <div class="grid__items">
+
+    <div class="form-vertical">
+      {% form 'create_customer' %}
+
+        {{ form.errors | default_errors }}
+        {% comment %}
+        <label for="FirstName" class="hidden-label">{{ 'customer.register.first_name' | t }}</label>
+        <input type="text" name="customer[first_name]" id="FirstName" class="input-full" placeholder="{{ 'customer.register.first_name' | t }}" {% if form.first_name %}value="{{ form.first_name }}"{% endif %} autocapitalize="words" autofocus>
+        <label for="LastName" class="hidden-label">{{ 'customer.register.last_name' | t }}</label>
+        <input type="text" name="customer[last_name]" id="LastName" class="input-full" placeholder="{{ 'customer.register.last_name' | t }}" {% if form.last_name %}value="{{ form.last_name }}"{% endif %} autocapitalize="words">
+        {% endcomment %}
+
+        <label for="Email" class="hidden-label">{{ 'customer.register.email' | t }}</label>
+        <input type="email" name="customer[email]" id="Email Address" class="input-full{% if form.errors contains 'email' %} error{% endif %}" placeholder="{{ 'customer.register.email' | t }}" {% if form.email %} value="{{ form.email }}"{% endif %} autocorrect="off" autocapitalize="off">
+
+        <label for="CreatePassword" class="hidden-label">{{ 'customer.register.password' | t }}</label>
+        <input type="password" name="customer[password]" id="CreatePassword" class="input-full{% if form.errors contains 'password' %} error{% endif %}" placeholder="{{ 'customer.register.password' | t }}">
+      
+        <label for="password_confirmation" class="hidden-label">{{ 'customer.register.password' | t }}</label>
+        <input type="password" name="customer[password_confirmation]" id="password_confirmation" class="input-full{% if form.errors contains 'password' %} error{% endif %}" placeholder="Confirm Password"/>
+
+      
+      <div class="form-subscribe">
+        <span> Subscribe for updates and news? </span>
+        <div>
+          <input type="checkbox" id="agree" />
+          <label for="agree">
+            I confirm that I accept the <a href="/pages/terms-of-use">membership policy</a> and that I have read and understood the <a href="/pages/terms-of-use">privacy policy</a>.
+          </label>
+        </div>
+        <div>
+          <input type="hidden" name="customer[accepts_marketing]" value="" />
+  		  <input id="sign-up" type="checkbox" name="customer[accepts_marketing]" />
+          <label for="sign-up">
+            Subscribe to our newsletter.
+          </label>
+        </div>
+      </div>
+
+        <p>
+          <input type="submit" value="{{ 'customer.register.submit' | t }}" class="btn-account">
+        </p>
+
+      {% endform %}
+    </div>
+
+  </div>
+
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+  $('#CartDrawer_Drawer form#create_customer').submit(function(e) {
+    
+    if ( $('#CartDrawer_Drawer #CreatePassword').val() === $('#CartDrawer_Drawer #password_confirmation').val()) {
+      console.log('Password Good!!');
+
+    } else {
+      //$('.password-match').fadeIn("slow");
+      console.log('NO BUENO - TRY AGAIN BUDDY');
+      e.preventDefault(); // stops our form from submitting
+    }
+  });
+  
+  $('body').on('click', '#CartDrawer_Drawer [name="goto_pp"], #CartDrawer_Drawer [name="goto_gc"], #CartDrawer_Drawer [name="create_account"]', function() {
+    if ($('#agree').is(':checked')) {
+      $(this).submit();
+    }
+    else {
+      alert("You must agree with the terms and conditions to create account.");
+      return false;
+    }
+  });
+  
+});
+</script>

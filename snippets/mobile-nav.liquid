@@ -1,0 +1,44 @@
+<div class="desk--hide">
+  <div class="mob-first-row">
+
+   <div>
+    <div class="mob-search-bar-wrappa">
+      {% include 'search-bar-auto', search_btn_style: 'btn-account', search_bar_location: 'search-bar--header-auto' %}
+    </div>
+    <a href="/search" id="mob_search_init_btnzor" class="site-nav__link site-nav__link--icon" {% comment %}{% if search_modal %} js-toggle-search-modal{% endif %}" data-mfp-src="#SearchModal"{% endcomment %}>
+      <span class="icon-fallback-text">
+        <img src="{{ 'search.svg' | file_url }}" alt="search icon">
+        <!--<span class="icon icon-search" aria-hidden="true"></span>-->
+        <span class="fallback-text">{{ 'general.search.title' | t }}</span>
+      </span>
+    </a><!-- search -->
+  </div>
+
+    {% comment %}
+    <a href="/cart" class="site-nav__link cart-link js-drawer-open-button-right" aria-controls="CartDrawer">
+      <span class="icon-fallback-text">
+        <span class="cart-item-count">( {{ cart.item_count }} )</span>
+        <!--<span class="icon icon-cart" aria-hidden="true"></span>-->
+        <span class="fallback-text">{{ 'layout.cart.title' | t }}</span>
+      </span>
+    </a><!-- cart -->
+    {% endcomment %}
+
+    <a class="site-nav__link site-nav__link--icon cart-link load-cart {% if cart.item_count > 0 %} bold {% endif %}">
+      
+    <span class="cart-item-count">( {{ cart.item_count }} )</span>
+      <span class="icon-fallback-text">
+        <span class="fallback-text">{{ 'layout.cart.title' | t }}</span>
+      </span>
+    </a>
+
+    <div class="site-nav--open site-nav--mobilezor">
+      <button id="NavDropdown" type="button" class="icon-fallback-text site-nav__link site-nav__link--icon no-pad-right site-nav__link--burger js-drawer-open-button-left" aria-controls="NavDrawer">
+        <span class="burger-icon burger-icon--top"></span>
+        <span class="burger-icon burger-icon--bottom"></span>
+        <span class="fallback-text">{{ 'general.drawers.navigation' | t }}</span>
+      </button>
+    </div>
+
+  </div> <!-- / mob first row -->
+</div> <!--// MOBILE NAV BUTTON -->

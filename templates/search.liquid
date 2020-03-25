@@ -1,0 +1,200 @@
+
+
+{{ 'ajaxinate.min.js' | asset_url | script_tag }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.matchHeight/0.7.2/jquery.matchHeight-min.js" integrity="sha256-+oeQRyZyY2StGafEsvKyDuEGNzJWAbWqiO2L/ctxF6c=" crossorigin="anonymous"></script>
+
+<!-- /templates/search.liquid -->
+{% comment %}
+
+  To return only products or pages in results:
+    - http://docs.shopify.com/manual/configuration/store-customization/return-only-product-in-storefront-search-results
+    - Or manually add type=product or type=page to the search URL as a parameter
+
+{% endcomment %}
+
+{% comment %}
+  Avoid accessing search.results before the opening paginate tag.
+  If you do, the pagination of results will be broken.
+{% endcomment %}
+{% paginate search.results by 12 %}
+
+{% comment %}
+  <div class="grid" data-section-type="search">
+    <div class="grid__item">
+      <header class="section-header text-center">
+        {% if search.performed %}
+          {% if search.results_count == 0 %}
+            <h1 class="text-center">{{ 'general.search.no_results_html' | t: terms: search.terms }}</h1>
+          {% else %}
+            <h1 class="text-center">{{ 'general.search.results_for_html' | t: terms: search.terms }}</h1>
+          {% endif %}
+        {% else %}
+          <h1 class="text-center">{{ 'general.search.title' | t }}</h1>
+        {% endif %}
+        <hr class="hr--small">
+      </header>
+
+      {% include 'search-bar', search_btn_style: 'btn', search_bar_location: 'search-bar--page' %}
+
+      {% if search.performed %}
+
+        <hr class="hr--medium hr--clear">
+
+        <div class="grid-uniform">
+          {% for item in search.results %}
+
+            {% if item.object_type == 'product' %}
+              {% assign product = item %}
+              {% include 'product-grid-item' %}
+            {% else %}
+              <div class="grid__item grid-search large--one-third medium--one-half">
+                <div class="grid-search__page">
+                  <a href="{{ item.url }}" class="grid-search__page-link">
+                    <span class="grid-search__page-content">
+                      <span class="h4 text-center">{{ item.title }}</span>
+                      {{ item.content | strip_html | truncatewords: 60 }}
+                    </span>
+                  </a>
+                </div>
+              </div>
+            {% endif %}
+
+          {% endfor %}
+        </div>
+
+        {% if paginate.pages > 1 %}
+          {% include 'pagination' %}
+        {% endif %}
+
+      {% endif %}
+
+    </div>
+  </div>
+{% endcomment %}
+
+<div class="grid">
+     {% include 'search-bar', search_btn_style: 'btn', search_bar_location: 'search-bar--page' %}
+</div>
+
+  <div class="grid-uniform_collection">
+
+    
+    <div class="filter-div grid__item medium--one-whole large--one-quarter">
+
+
+      <div class="view-all-search-articles">
+        {% comment %}
+        <div>
+          <span class="title">Pages </span>
+        </div>
+        {% endcomment %}
+      </div>
+      <ul class="search-results-articles">
+        {% comment %}
+        {% for item in search.results %}
+        {% unless item.object_type == 'product' %}
+        <li class="results">
+          <a href="{{ item.url }}">
+            <span>{{ item.title }}</span>
+          </a>
+        </li>
+        {% endunless %}
+        {% endfor %}
+        {% endcomment %}
+      </ul>
+
+       
+    </div>
+   
+
+    <div id="Brands_header">
+        <header id="Brands_Hero" class="section-headerzor filter-div">
+          <div class="brand_info">
+            <div class="brand_title">
+
+              {% if search.performed %}
+                {% if search.results_count == 0 %}
+                  <h1>{{ 'general.search.no_results_html' | t: terms: search.terms }} </h1>
+                {% else %}
+                  <h1>
+                    Search Results<br>
+                  "{{ search.terms }}" </h1>
+                {% endif %}
+              {% else %}
+                <h1 >{{ 'general.search.title' | t }} </h1>
+              {% endif %}
+
+            </div>
+
+            <div class="brand_copy">
+                <p>
+                  
+                  <br>
+
+                </p>
+            </div>
+
+          </div>
+        </header>
+
+        <div  id="AjaxinateLoop">
+          {% assign grid_item_width = 'medium--one-half large--one-third' %}
+          {% for item in search.results %}
+
+            {% if item.object_type == 'product' %}
+              {% assign product = item %}
+              {% include 'product-grid-item' %}
+            {% else %}
+
+              
+
+              {% comment %}
+              <div class="grid__item grid-search large--one-third medium--one-half">
+                <div class="grid-search__page">
+                  <a href="{{ item.url }}" class="grid-search__page-link">
+                    <span class="grid-search__page-content">
+                      <span class="h4 text-center">{{ item.title }}</span>
+                      {{ item.content | strip_html | truncatewords: 60 }}
+                    </span>
+                  </a>
+                </div>
+              </div>
+              {% endcomment %}
+            {% endif %}
+
+          {% endfor %}
+
+        </div> <!-- ajaxinate loop -->
+    </div><!-- brands header -->
+
+  </div>
+
+  <div id="AjaxinatePagination">
+      {% if paginate.next %}
+        <a href="{{ paginate.next.url }}">Loading More</a>
+      {% endif %}
+    </div>
+
+{% endpaginate %}
+
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  var endlessScroll = new Ajaxinate();
+
+//alert('mas!!');
+
+});
+$(function() {
+
+  $('.product_wrap').matchHeight({
+      byRow: false,
+      property: 'height',
+      target: null
+  });
+
+});
+</script>

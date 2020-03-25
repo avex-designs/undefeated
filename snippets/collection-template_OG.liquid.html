@@ -1,0 +1,101 @@
+{% comment %}
+  Collection template, used on collection.liquid and collection.image.liquid
+{% endcomment %}
+
+{% paginate collection.products by 12 %}
+
+{% comment %}
+<header class="section-header text-center">
+  <h1>{{ collection.title }}</h1>
+  <hr class="hr--small">
+  {% if collection.description != blank %}
+    <div class="grid">
+      <div class="grid__item">
+        <div class="rte">
+          {{ collection.description }}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="grid--full collection-sorting{% if section.settings.collection_sort_enable %} collection-sorting--enabled{% endif %}">
+    {% if section.settings.collection_sort_enable %}
+      {% include 'collection-sorting' %}
+    {% endif %}
+  </div>
+
+  {%- assign is_vendor_or_type_collection = false -%}
+  {%- if collection.current_type != blank or collection.current_vendor != blank -%}
+    {%- assign is_vendor_or_type_collection = true -%}
+  {%- endif -%}
+
+  {% if section.settings.collection_tags_enable and is_vendor_or_type_collection == false %}
+    {% if collection.all_tags.size > 0 %}
+      {% if section.settings.collection_sort_enable %}
+        <hr class="hr--small">
+      {% endif %}
+      <ul class="tags tags--collection inline-list">
+        {% comment %}
+          Used for the catalog collection (/collections/all) and product collections (collections/{collection.handle})
+        {% endcomment %}
+        <li{% unless current_tags %} class="tag--active"{% endunless %}>
+          <a href="{% if collection.url == blank %}{{ routes.all_products_collection_url }}{% else %}{{ collection.url }}{% endif %}">
+            {{ 'collections.general.all_of_collection' | t }}
+          </a>
+        </li>
+
+        {% for tag in collection.all_tags %}
+          {% if current_tags contains tag %}
+            <li class="tag--active">
+              {{ tag | link_to_remove_tag: tag }}
+            </li>
+          {% else %}
+            <li>
+              {% comment %}
+                Use link_to_add_tag if you want to allow filtering
+                by multiple tags
+              {% endcomment %}
+              {{ tag | link_to_tag: tag }}
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endif %}
+
+  {% if section.settings.collection_tags_enable %}
+    <hr class="hr--small hr--clear">
+  {% endif %}
+</header>
+
+{% endcomment %}
+
+
+  <div class="grid-uniform_collection">
+    {% assign grid_item_width = 'medium--one-half large--one-third' %}
+    
+    {% for product in collection.products %}
+    
+      {% include 'product-grid-item' %}
+    
+    {% else %}
+    
+      {% if collection.handle == 'all' %}
+        {% comment %} Add default products to help with onboarding for collections/all only {% endcomment %}
+        {% include 'onboarding-featured-products' %}
+      {% else %}
+        {% comment %} If collection exists but is empty, display message {% endcomment %}
+        <div class="grid__item text-center">
+          <p>{{ 'collections.general.no_matches' | t }}</p>
+        </div>
+      {% endif %}
+    
+    {% endfor %}
+  </div>
+
+
+{% if paginate.pages > 1 %}
+  {% include 'pagination' %}
+{% endif %}
+
+{% endpaginate %}
