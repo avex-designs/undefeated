@@ -1185,12 +1185,6 @@
         "type": "header"
       },
       {
-        "default": true,
-        "id": "checkout_show_international_checkout",
-        "label": "Enable International Shipping",
-        "type": "checkbox"
-      },
-      {
         "id": "shipping_us_advice",
         "label": "US Shipping Advice",
         "type": "textarea"
