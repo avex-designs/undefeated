@@ -140,210 +140,255 @@
                     {% capture "form_id" %}AddToCartForm--{{ section.id }}{%- endcapture %}
                     {% form 'product', product, class:form_classes, id:form_id, data-product-form: '' %}
 
-                      {% unless product.has_only_default_variant %}
+                      {% if product.available %}
+                        {% unless product.has_only_default_variant %}
 
-                        {% for option in product.options_with_values %}
+                          {% for option in product.options_with_values %}
 
-                          <div class="radio-wrapper js product-form__item">
-                            <label class="single-option-radio__label{% if option.name == 'Default' or option.name == 'Title' %} hidden-label{% endif %}"
-                              for="ProductSelect-option-{{ forloop.index0 }}">
-                              {{ option.name | escape }}
-                            </label>
+                            {% comment %}
+                              Only show "sold out" next to the option value if:
+                                - There is a single product option
+                                - There are 2 product options and the first option only has one value
+                            {% endcomment %}
+                            {% assign can_show_sold_out_ui_for_option = false %}
+                            {% if product.options.size == 1 %}
+                              {% assign can_show_sold_out_ui_for_option = true %}
+                            {% elsif product.options.size == 2 and option.position == 2 and product.options_with_values[0].values.size == 1 %}
+                              {% assign can_show_sold_out_ui_for_option = true %}
+                            {% endif %}                          
 
-                            {% if section.settings.product_selector == 'radio' %}
+                            <div class="radio-wrapper js product-form__item">
+                              <label class="single-option-radio__label{% if option.name == 'Default' or option.name == 'Title' %} hidden-label{% endif %}"
+                                for="ProductSelect-option-{{ forloop.index0 }}">
+                                {{ option.name | escape }}
+                              </label>
 
-                                <fieldset class="single-option-radio"
-                                  name="{{ option.name | handleize }}"
-                                  id="ProductSelect-option-{{ forloop.index0 }}">
-                                  {% assign option_index = forloop.index %}
-                                  {% for value in option.values %}
-                                    {% assign variant_label_state = true %}
-                                    {% if product.options.size == 1 %}
-                                      {% unless product.variants[forloop.index0].available  %}
-                                        {% assign variant_label_state = false %}
-                                      {% endunless %}
-                                    {% endif %}
-                                    <input type="radio"
-                                      {% if option.selected_value == value %} checked="checked"{% endif %}
-                                      {% unless variant_label_state %} disabled="disabled"{% endunless %}
-                                      value="{{ value | escape }}"
-                                      data-index="option{{ option_index }}"
-                                      name="{{ option.name | handleize }}"
-                                      class="single-option-selector__radio{% unless variant_label_state %} disabled{% endunless %}"
-                                      id="ProductSelect-option-{{ option.name | handleize }}-{{ value | escape }}">
-                                    <label for="ProductSelect-option-{{ option.name | handleize }}-{{ value | escape }}"{% unless variant_label_state %} class="disabled"{% endunless %}>{{ value | escape }}</label>
-                                  {% endfor %}
-                                </fieldset>
+                              {% if section.settings.product_selector == 'radio' %}
 
-                            {% else %}
+                                  <fieldset class="single-option-radio"
+                                    name="{{ option.name | handleize }}"
+                                    id="ProductSelect-option-{{ forloop.index0 }}">
+                                    {% assign option_index = forloop.index %}
+                                    {% for value in option.values %}
+                                      {% assign variant_label_state = true %}
+                                      {% if product.options.size == 1 %}
+                                        {% unless product.variants[forloop.index0].available  %}
+                                          {% assign variant_label_state = false %}
+                                        {% endunless %}
+                                      {% endif %}
+                                      <input type="radio"
+                                        {% if option.selected_value == value %} checked="checked"{% endif %}
+                                        {% unless variant_label_state %} disabled="disabled"{% endunless %}
+                                        value="{{ value | escape }}"
+                                        data-index="option{{ option_index }}"
+                                        name="{{ option.name | handleize }}"
+                                        class="single-option-selector__radio{% unless variant_label_state %} disabled{% endunless %}"
+                                        id="ProductSelect-option-{{ option.name | handleize }}-{{ value | escape }}">
+                                      <label for="ProductSelect-option-{{ option.name | handleize }}-{{ value | escape }}"{% unless variant_label_state %} class="disabled"{% endunless %}>{{ value | escape }}</label>
+                                    {% endfor %}
+                                  </fieldset>
 
-                                <select class="single-option-selector__radio single-option-selector-{{ section.id }} product-form__input
-                               
-                                {% if option.name == 'Color' or option.name == 'Color' %}
-                                  {% for value in option.values limit:1  %}
-                                    color-select
-                                  {% endfor %}
-                                {% else %}
-                                  {% for value in option.values limit:1  %}
-                                    size-select
-                                  {% endfor %}
-                                {%endif %}"
-                                {% if option.name == 'Color' or option.name == 'Color' %}
-                                  {% for value in option.values %}
-                                    {% if value == "-" %} style="display:none;" {% endif %}
-                                  {% endfor %}
-                                {%endif %}
-                                id="SingleOptionSelector-{{ forloop.index0 }}" data-index="option{{ forloop.index }}">
+                              {% else %}
 
-                                {% if option.name == 'Color' or option.name == 'Color' %}
+                                  <select class="single-option-selector__radio single-option-selector-{{ section.id }} product-form__input
+                                 
+                                  {% if option.name == 'Color' or option.name == 'Color' %}
+                                    {% for value in option.values limit:1  %}
+                                      color-select
+                                    {% endfor %}
+                                  {% else %}
+                                    {% for value in option.values limit:1  %}
+                                      size-select
+                                    {% endfor %}
+                                  {%endif %}"
+                                  {% if option.name == 'Color' or option.name == 'Color' %}
+                                    {% for value in option.values %}
+                                      {% if value == "-" %} style="display:none;" {% endif %}
+                                    {% endfor %}
+                                  {%endif %}
+                                  id="SingleOptionSelector-{{ forloop.index0 }}" data-index="option{{ forloop.index }}">
 
-                                  {% for value in option.values %}
-                                    <option value="{{ value | escape }}"{% if option.selected_value == value %} selected="selected"{% endif %}>{{ value | escape }}</option>
-                                  {% endfor %}
+                                  {% if option.name == 'Color' or option.name == 'Color' %}
 
-                                {% else %}
-                    
-                                {% comment %}
-                                  {% for value in option.values %}
-                                    {% if option.selected_value == value %} 
-                                    <option value="{{ value | escape }}" selected="selected"> Select {{ option.name }} </option>
-                                    {% else %}
+                                    {% for value in option.values %}
+                                      <option value="{{ value | escape }}"{% if option.selected_value == value %} selected="selected"{% endif %}>{{ value | escape }}</option>
+                                    {% endfor %}
 
-                                    {% endif %}
-                                  {% endfor %}
-                                  {% endcomment %}
+                                  {% else %}
+                      
+                                  {% comment %}
+                                    {% for value in option.values %}
+                                      {% if option.selected_value == value %} 
+                                      <option value="{{ value | escape }}" selected="selected"> Select {{ option.name }} </option>
+                                      {% else %}
 
-                                  {% for value in option.values %}
-                                    <option value="{{ value | escape }}"{% if option.selected_value == value %} selected="selected"{% endif %}>{{ value | escape }}</option>
-                                  {% endfor %}
+                                      {% endif %}
+                                    {% endfor %}
+                                    {% endcomment %}
 
-                                {% endif %}
+                                    {% for value in option.values %}
+                                      {% comment %}
+                                        If the product only has one option (like size) then we can show values as sold out by checking the variant for that option
+                                      {% endcomment %}
+                                      {% assign is_disabled = false %}
+                                      {% if can_show_sold_out_ui_for_option %}
+                                        {% for v in product.variants %}
+                                          {% assign variant_option_prop = 'option' | append: option.position %}
+                                          {% if v[variant_option_prop] == value and v.available == false %}
+                                            {% assign is_disabled = true %}
+                                          {% endif %}
+                                        {% endfor %}
+                                      {% endif %}
 
-                                </select>
+                                      <option
+                                        value="{{ value | escape }}"
+                                        {% if is_disabled %}
+                                          disabled="disabled"
+                                          aria-disabled="true"
+                                        {% elsif option.selected_value == value %}
+                                          selected="selected"
+                                        {% endif %}
+                                      >
+                                        {{ value | escape }}{% if is_disabled %} - SOLD OUT{% endif %}
+                                      </option>                                      
+                                    {% endfor %}
 
-                            {% endif %}
+                                  {% endif %}
 
-                          </div> <!-- radio-wrapper product-form__item -->
+                                  </select>
 
-                          {% if option.name == 'Color' or option.name == 'Color' %}
-                              {% for value in option.values limit:1 %}
-                                  {% unless value == "-" %}
-                      				<style>
-                       				 .product-single__photo--flex-wrapper { display:none; }
-                      				</style>
-                                    <script type="text/javascript">
-                                    $(document).ready(function() {
-                                      /* Page Load Color Variant Image Filter */
-                                      if ( $(window).width() >= 991 ) {
+                              {% endif %}
 
-                                          var selectedColor = $('select.color-select').val();
-                                          var selectedFilter = selectedColor.replace(' ', '');
-                                          var onLoadSelect = selectedFilter.toLowerCase()
-                                          $('.product-single__photo--flex-wrapper').hide();
-                                          $('[data-variant='+onLoadSelect+']').fadeIn('slow');
+                            </div> <!-- radio-wrapper product-form__item -->
 
-                                          console.log('page load - filter colors images / above 991 - PDP');
-                                      }
-                                      $('select.color-select').on('change',function(event){
+                            {% if option.name == 'Color' or option.name == 'Color' %}
+                                {% for value in option.values limit:1 %}
+                                    {% unless value == "-" %}
+                        				<style>
+                         				 .product-single__photo--flex-wrapper { display:none; }
+                        				</style>
+                                      <script type="text/javascript">
+                                      $(document).ready(function() {
+                                        /* Page Load Color Variant Image Filter */
                                         if ( $(window).width() >= 991 ) {
 
-                                          var selectedColor = $(this).val().toLowerCase();
-                                          var selectedFilter = selectedColor.replace(' ', '');
-                                          $('.product-single__photo--flex-wrapper').hide();
-                                          $('[data-variant='+selectedFilter+']').fadeIn('slow');
+                                            var selectedColor = $('select.color-select').val();
+                                            var selectedFilter = selectedColor.replace(' ', '');
+                                            var onLoadSelect = selectedFilter.toLowerCase()
+                                            $('.product-single__photo--flex-wrapper').hide();
+                                            $('[data-variant='+onLoadSelect+']').fadeIn('slow');
 
-                                          //console.log(selectedColor + ' change colors image - above 991 - PDP' );
-                                          //console.log(selectedFilter + ' change colors image - above 991 - PDP');
-                                          console.log('change colors image - above 991 - PDP');
-
-                                          var onLoadSelect = selectedFilter.toLowerCase();
-                                          var yanana = $('[data-variant='+onLoadSelect+'] img')
-
-                                          $('.product-single__photos').magnificPopup({
-                                              delegate: yanana,
-                                              type: 'image',
-                                              midClick: true,
-                                              mainClass: 'mfp-fade',
-                                              closeOnBgClick: true,
-                                              closeBtnInside: false,
-                                              closeMarkup: '<button title="Close (Esc)" type="button" class="mfp-close"> <img src="https://cdn.shopify.com/s/files/1/2206/5449/files/close-modal.svg?5305"/> </button>',
-                                              closeOnContentClick: true,
-                                              tClose: theme.strings.zoomClose,
-                                              removalDelay: 500,
-                                              disableOn: function() {
-                                                if( $(window).width() < 992 ) {
-                                                  return false;
-                                                }
-                                                return true;
-                                              },
-                                              callbacks: {
-                                                beforeOpen: function() {
-                                                  console.log(yanana.attr('data-id') + ' - PDP');
-                                                }
-                                              },
-                                              gallery: {
-                                                enabled: true,
-                                                navigateByImgClick: false,
-                                                arrowMarkup:
-                                                  '<button title="%title%" type="button" class="mfp-arrow mfp-arrow-%dir%"><span class="mfp-chevron mfp-chevron-%dir%"></span></button>',
-                                                tPrev: theme.strings.zoomPrev,
-                                                tNext: theme.strings.zoomNext
-                                              }
-                                          });
-                                          
-                                        } else {
-                                          return;
+                                            console.log('page load - filter colors images / above 991 - PDP');
                                         }
+                                        $('select.color-select').on('change',function(event){
+                                          if ( $(window).width() >= 991 ) {
+
+                                            var selectedColor = $(this).val().toLowerCase();
+                                            var selectedFilter = selectedColor.replace(' ', '');
+                                            $('.product-single__photo--flex-wrapper').hide();
+                                            $('[data-variant='+selectedFilter+']').fadeIn('slow');
+
+                                            //console.log(selectedColor + ' change colors image - above 991 - PDP' );
+                                            //console.log(selectedFilter + ' change colors image - above 991 - PDP');
+                                            console.log('change colors image - above 991 - PDP');
+
+                                            var onLoadSelect = selectedFilter.toLowerCase();
+                                            var yanana = $('[data-variant='+onLoadSelect+'] img')
+
+                                            $('.product-single__photos').magnificPopup({
+                                                delegate: yanana,
+                                                type: 'image',
+                                                midClick: true,
+                                                mainClass: 'mfp-fade',
+                                                closeOnBgClick: true,
+                                                closeBtnInside: false,
+                                                closeMarkup: '<button title="Close (Esc)" type="button" class="mfp-close"> <img src="https://cdn.shopify.com/s/files/1/2206/5449/files/close-modal.svg?5305"/> </button>',
+                                                closeOnContentClick: true,
+                                                tClose: theme.strings.zoomClose,
+                                                removalDelay: 500,
+                                                disableOn: function() {
+                                                  if( $(window).width() < 992 ) {
+                                                    return false;
+                                                  }
+                                                  return true;
+                                                },
+                                                callbacks: {
+                                                  beforeOpen: function() {
+                                                    console.log(yanana.attr('data-id') + ' - PDP');
+                                                  }
+                                                },
+                                                gallery: {
+                                                  enabled: true,
+                                                  navigateByImgClick: false,
+                                                  arrowMarkup:
+                                                    '<button title="%title%" type="button" class="mfp-arrow mfp-arrow-%dir%"><span class="mfp-chevron mfp-chevron-%dir%"></span></button>',
+                                                  tPrev: theme.strings.zoomPrev,
+                                                  tNext: theme.strings.zoomNext
+                                                }
+                                            });
+                                            
+                                          } else {
+                                            return;
+                                          }
+                                        });
                                       });
-                                    });
-                                    </script>
-                                  {% endunless %}
-                              {% endfor %}
-                          {% endif %}
+                                      </script>
+                                    {% endunless %}
+                                {% endfor %}
+                            {% endif %}
 
-                        {% endfor %}
+                          {% endfor %}
 
-                      {% endunless %}
+                        {% endunless %}
 
-                      <select name="id" id="ProductSelect" class="product-single__variants no-js">
-                        {% for variant in product.variants %}
-                          {% if variant.available %}
-                            <option {% if variant == product.selected_or_first_available_variant %}
-                              selected="selected" {% endif %}
-                              data-sku="{{ variant.sku }}"
-                              value="{{ variant.id }}">
-                              {{ variant.title }} - {{ variant.price | money_with_currency }}
-                            </option>
-                          {% else %}
-                            <option disabled="disabled">
-                              {{ variant.title }} - {{ 'products.product.sold_out' | t }}
-                            </option>
-                          {% endif %}
-                        {% endfor %}
-                      </select>
+                        <select name="id" id="ProductSelect" class="product-single__variants no-js">
+                          {% for variant in product.variants %}
+                            {% if variant.available %}
+                              <option {% if variant == product.selected_or_first_available_variant %}
+                                selected="selected" {% endif %}
+                                data-sku="{{ variant.sku }}"
+                                value="{{ variant.id }}">
+                                {{ variant.title }} - {{ variant.price | money_with_currency }}
+                              </option>
+                            {% else %}
+                              <option disabled="disabled">
+                                {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+                              </option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
 
-                      {% if section.settings.quantity_enabled %}
-                      <div class="product-single__quantity">
-                        <label for="Quantity" class="product-single__quantity-label js-quantity-selector">{{ 'products.product.quantity' | t }}</label>
-                        <input type="number" hidden="hidden" id="Quantity" name="quantity" value="1" min="1" class="js-quantity-selector">
-                      </div>
-                      {% endif %}
-
-                      <div class="product-single__add-to-cart{% if section.settings.add_to_cart_button_size == 'large' %} product-single__add-to-cart--full-width{% endif %}">
-                        <button type="submit" name="add" href="#CartDrawer_ATC" id="AddToCart--{{ section.id }}" disabled="disabled" class="disabled btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
-                          <span class="btn__text">
-                              Select an<br>option
-                          </span>
-                          {% comment %}
-                          <span class="btn__text">
-                              {{ 'products.product.add_to_cart' | t }}
-                          </span>
-                          {% endcomment %}
-                        </button>
-                        {% if section.settings.enable_payment_button %}
-                          {{ form | payment_button }}
+                        {% if section.settings.quantity_enabled %}
+                        <div class="product-single__quantity">
+                          <label for="Quantity" class="product-single__quantity-label js-quantity-selector">{{ 'products.product.quantity' | t }}</label>
+                          <input type="number" hidden="hidden" id="Quantity" name="quantity" value="1" min="1" class="js-quantity-selector">
+                        </div>
                         {% endif %}
-                      </div>
+
+                        <div class="product-single__add-to-cart{% if section.settings.add_to_cart_button_size == 'large' %} product-single__add-to-cart--full-width{% endif %}">
+                          <button type="submit" name="add" href="#CartDrawer_ATC" id="AddToCart--{{ section.id }}" disabled="disabled" class="disabled btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+                            <span class="btn__text">
+                                Select an<br>option
+                            </span>
+                            {% comment %}
+                            <span class="btn__text">
+                                {{ 'products.product.add_to_cart' | t }}
+                            </span>
+                            {% endcomment %}
+                          </button>
+                          {% if section.settings.enable_payment_button %}
+                            {{ form | payment_button }}
+                          {% endif %}
+                        </div>
+                      {% else %}
+                        <div class="product-single__add-to-cart{% if section.settings.add_to_cart_button_size == 'large' %} product-single__add-to-cart--full-width{% endif %}">
+                          <button type="submit" name="add" id="AddToCart--{{ section.id }}" disabled="disabled" class="disabled btn btn--add-to-cart">
+                            <span class="btn__text">
+                                Sold Out
+                            </span>
+                          </button>
+                        </div>
+                      {% endif %}                      
                     {% endform %}
                     </div>
 

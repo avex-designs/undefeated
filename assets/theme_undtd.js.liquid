@@ -531,10 +531,11 @@ slate.Variants = (function() {
      * @return {event} variantPriceChange
      */
     _updatePrice: function(variant) {
-      if (
-        variant.price === this.currentVariant.price &&
-        variant.compare_at_price === this.currentVariant.compare_at_price
-      ) {
+      // It's possible for currentVariant to not exist
+      var currPrice = this.currentVariant && this.currentVariant.price;
+      var currComparePrice = this.currentVariant && this.currentVariant.compare_at_price;
+
+      if (variant.price === currPrice && variant.compare_at_price === currComparePrice) {
         return;
       }
 
@@ -551,13 +552,13 @@ slate.Variants = (function() {
      * @return {event} variantSKUChange
      */
     _updateSKU: function(variant) {
-      if (variant.sku === this.currentVariant.sku) {
+      var skuz = this.currentVariant && this.currentVariant.sku;
+
+      if (variant.sku === skuz) {
         return;
       }
-      
-      var skuz = this.currentVariant.sku
-      
-      console.log(skuz);
+           
+      // console.log(skuz);
 
       this.$container.trigger({
         type: 'variantSKUChange',
@@ -3011,16 +3012,19 @@ theme.Product = (function() {
 		return;
 		}*/
 
-		var selectedColor = $('select.color-select').val();
-		var selectedFilter = selectedColor.replace(' ', '');
-		var onLoadSelect = selectedFilter.toLowerCase()
+    var $colorSelect = $('select.color-select');
+    var yanana = $('.product-single__photo--flex-wrapper img');
 
-		if ( selectedColor == "-" ) {
-				var yanana = $('.product-single__photo--flex-wrapper img')
-		} else {
-				var yanana = $('[data-variant='+onLoadSelect+'] img');
-		}
+    // Make sure the page doesn't break if no color selector exists!
+    if ($colorSelect.length) {
+      var selectedColor = $('select.color-select').val();
+      var selectedFilter = selectedColor.replace(' ', '');
+      var onLoadSelect = selectedFilter.toLowerCase();
 
+      if ( selectedColor != "-" ) {
+        yanana = $('[data-variant='+onLoadSelect+'] img');   
+      }     
+    }
 
 
 		$('.product-single__photo--flex-wrapper img').on('click', function (e) {
@@ -3289,7 +3293,7 @@ theme.Product = (function() {
 							console.log('RESIZE 250 - owlfilter 250')
 						//}, 250);
 
-						var selectedColor = $('select.color-select').val().toLowerCase();
+						var selectedColor = ($('select.color-select').val() && $('select.color-select').val().toLowerCase() || '-');
 						var selectedFilter = selectedColor.replace(' ', '');
 						//console.log(selectedColor + ' create carousel - destroy slider / resize above 991 - b' );
 	                    //console.log(selectedColor + ' create carousel - destroy slider / resize above 991 - b');
@@ -3423,7 +3427,7 @@ theme.Product = (function() {
 				//}, 250);
 			}
 
-			var selectedColor = $('select.color-select').val().toLowerCase();
+			var selectedColor = ($('select.color-select').val() && $('select.color-select').val().toLowerCase() || '-');
 			var selectedFilter = selectedColor.replace(' ', '');
 			//console.log(selectedColor + ' destroy carousel - a');
 	        //console.log(selectedFilter + ' destroy carousel - a');
