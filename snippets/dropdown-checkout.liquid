@@ -1,6 +1,6 @@
 <div class="cart-action">
     <div class="contl">
-      <h3>United States Customers</h3>
+      <h3>Notice</h3>
       {% comment %}
       {% if settings.shipping_us_advice != "" %} 
       <p class="advice">{{ settings.shipping_us_advice }}</p>
@@ -14,9 +14,10 @@
           <input type="checkbox" id="checkout-terms" title="Click to agree to the terms and refund policy"/>
           I agree to the <a href="/">terms and refund policy</a>
         </label></p>
-      <button id="checkout-btn" type="submit" name="checkout"  class="btn-uppercase continue-shopping"> continue to <br>u.s. checkout </button>
+      <button id="checkout-btn" type="submit" name="checkout"  class="btn-uppercase continue-shopping"> continue to checkout </button>
     </div>
     {% if settings.checkout_show_international_checkout %}
+    <!--
     <div class="intl">
       <h3>International Customers</h3>
       <div class="intl-checkboxes">
@@ -31,6 +32,7 @@
       </div>
       <button id="checkout-int-btn"  class="btn-uppercase continue-shopping">Continue to <br>Global Checkout</button>
     </div>
+    -->
     {% endif %}
 
     {% comment %}
@@ -41,48 +43,37 @@
 
 </div>
 
-
-    <script type="text/javascript">
-      $(document).on('click', '#checkout-btn', function () {
+<script type="text/javascript">
+  $(document).on('click', '#checkout-btn', function () {
     if(document.getElementById('checkout-terms').checked) {
       document.location = '/checkout';
-        } else {
-          alert("You must confirm that you agree to the terms & refund policy before proceeding");
-        }
+    }
+    else {
+      alert("You must confirm that you agree to the terms & refund policy before proceeding");
+    }
     return false;
-      });
+  });
 
-      $(document).on('click', '#checkout-int-btn', function () {
-    if(document.getElementById('checkout-terms-int').checked) {
-            if(document.getElementById('checkout-international').checked) {
-             document.location = '/pages/international-checkout';
-            } else {
-        alert("You must confirm you are aware of the additional costs of international orders");
-            }
-        } else {
-          alert("You must confirm that you agree to the terms & refund policy before proceeding");
-        }
-    return false;
-      });
-
-    </script>
-    <script id="shipping-calculator-response-template" type="text/template">
-      <p id="shipping-rates-feedback" <% if (success) { %> class="success" <% } else { %> class="error" <% } %>>
-      <% if (success) { %>
-        <% if (rates.length > 1) { %> 
-        There are <%= rates.length %> shipping rates available for <%= address %>, starting at <%= rates[0].price %>.
-        <% } else if (rates.length == 1) { %>
-        There is one shipping rate available for <%= address %>.
-        <% } else { %>
-        We do not ship to this destination.
-        <% } %>
-      <% } else { %>
-        <%= errorFeedback %>
-      <% } %>
-      </p>
-      <ul id="shipping-rates">
-        <% for (var i=0; i<rates.length; i++) { %>
-        <li><%= rates[i].name %> at <%= rates[i].price %></li>
-        <% } %>
-      </ul> 
-    </script>
+</script>
+{% comment %}
+<script id="shipping-calculator-response-template" type="text/template">
+  <p id="shipping-rates-feedback" <% if (success) { %> class="success" <% } else { %> class="error" <% } %>>
+  <% if (success) { %>
+    <% if (rates.length > 1) { %> 
+    There are <%= rates.length %> shipping rates available for <%= address %>, starting at <%= rates[0].price %>.
+    <% } else if (rates.length == 1) { %>
+    There is one shipping rate available for <%= address %>.
+    <% } else { %>
+    We do not ship to this destination.
+    <% } %>
+  <% } else { %>
+    <%= errorFeedback %>
+  <% } %>
+  </p>
+  <ul id="shipping-rates">
+    <% for (var i=0; i<rates.length; i++) { %>
+    <li><%= rates[i].name %> at <%= rates[i].price %></li>
+    <% } %>
+  </ul> 
+</script>
+{% endcomment %}
