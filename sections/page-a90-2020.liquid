@@ -1,0 +1,462 @@
+<div id="am90" data-section-id="{{ section.id }}" data-section-type="page-am90-2020">
+  {% for block in section.blocks %}
+    
+    {% capture block_html %}
+      {% if block.type == "hero_image" %}
+
+        {% if block.settings.image != blank %}
+          {%- assign src = block.settings.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+
+          <div class="am90-hero" style="padding-bottom: {{ 100 | divided_by: block.settings.image.aspect_ratio }}%">
+            <img
+              class="lazyload"
+              data-src="{{ src }}"
+              data-widths="[180, 370, 590, 740, 900, 1080, 1296, 1512, 1728, 2048]"
+              data-aspectratio="{{ block.settings.image.aspect_ratio }}"
+              data-sizes="auto"
+              alt="{{ block.settings.image.alt | escape }}"
+            />
+          </div>
+          <noscript>
+            <img src="{{ block.settings.image | img_url: '1024x' }}" alt="{{ block.settings.image.alt | escape }}">
+          </noscript>          
+        {% endif %}
+
+      {% elsif block.type == "product_feature" %}
+        <div class="am90-product-feature">
+          <div class="am90-product-feature__top">
+            <div class="am90-product-feature__top-content">
+              <div class="am90-product-feature__top-logo">
+                <img src="{{ 'UND-AirMax-LOGO.png' | asset_url }}" />
+              </div>
+              <h2>{{ block.settings.title }}</h2>
+              <div class="am90-content">
+                {{ block.settings.content }}
+              </div>
+            </div>
+            <div class="am90-product-feature__top-image">
+              {%- assign src = block.settings.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+              <img
+                class="lazyload"
+                data-src="{{ src }}"
+                data-widths="[180, 370, 590, 740, 900]"
+                data-aspectratio="{{ block.settings.image.aspect_ratio }}"
+                data-sizes="auto"
+                alt="{{ block.settings.image.alt | escape }}"
+              />
+              <noscript>
+                <img src="{{ block.settings.image | img_url: '1024x' }}" alt="{{ block.settings.image.alt | escape }}">
+              </noscript>              
+            </div>            
+          </div>
+        </div>
+        {% assign bottom_images_html = '' %}
+        {% assign bottom_slides_html = '' %}
+
+        {% for i in (1..3) %}
+          {% assign setting_handle = 'additional_image_' | append: i %}
+          {% assign image_setting = block.settings[setting_handle] %}
+          {% if image_setting != blank %}
+            {% capture image %}
+              <div class="am90-product-feature__bottom-image">
+                <img src="{{ image_setting | img_url: '600x' }}" />
+              </div>
+            {% endcapture %}
+
+            {% capture slide %}
+              <div class="am90-product-feature__bottom-slide">
+                <img src="{{ image_setting | img_url: '600x' }}" />
+              </div>
+            {% endcapture %}
+
+            {% assign bottom_images_html = bottom_images_html | append: image %}
+            {% assign bottom_slides_html = bottom_slides_html | append: slide %}
+          {% endif %}
+        {% endfor %}
+
+        {% if bottom_images_html != blank %}
+          <div class="am90-product-feature__bottom">
+            <div class="am90-product-feature__bottom-image-wrap">
+              {{ bottom_images_html }}
+            </div>
+            <div class="am90-product-feature__bottom-slideshow-wrap">
+              <div class="am90-product-feature__bottom-slideshow">
+                {{ bottom_slides_html }}
+              </div>
+              <div class="am90-product-feature__bottom-slideshow-info">
+                <h6>Details</h6>
+                <span class="am90-product-feature__bottom-slideshow-progress"></span>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% elsif block.type == "product_grid" %}
+        <h3>{{ block.settings.title }}</h3>
+
+        {% capture product_grid_content %}
+          {% for i in (1..6) %}
+            {% assign product_setting_handle = 'product_' | append: i %}
+            {% assign title_setting_handle = 'product_' | append: i | append: '_title' %}
+            {% assign image_setting_handle = 'product_' | append: i | append: '_image' %}
+            
+            {% assign product_handle = block.settings[product_setting_handle] %}
+            {% assign title = block.settings[title_setting_handle] %}
+            {% assign image = block.settings[image_setting_handle] %}
+            
+            {% assign product = all_products[product_handle] %}
+
+            {% capture item_image_html %}
+              {% if image != blank %}
+                <img src="{{ image | img_url: '800x' }}" />
+              {% else if product != blank %}
+                <img src="{{ product.featured_image.src | img_url: '800x' }}" />
+              {% endif %}
+            {% endcapture %}
+
+            <div class="am90-product-grid__item">
+              <div class="am90-product-grid__item-gallery">
+                {% if product != blank %}<a href="{{ product.url }}">{% endif %}
+                  {{ item_image_html }}
+                {% if product %}</a>{% endif %}
+              </div>
+
+              {% if product != blank %}
+                <a href="{{ product.url }}" class="am90-product-grid__item-caption">
+              {% else %}
+                <div class="am90-product-grid__item-caption">
+              {% endif %}
+                  {% if title != blank %}
+                    {{ title }}
+                  {% else if product != blank %}
+                    {{ product.title }}
+                  {% endif %}                  
+              {% if product != blank %}
+                </a>
+              {% else %}
+                </div>
+              {% endif %} 
+            </div>
+          {% endfor %}
+        {% endcapture %}
+        
+        {% assign product_grid_content = product_grid_content | strip %}
+
+        {% if product_grid_content != blank %}
+          <div class="am90-product-grid">
+            {{ product_grid_content }}
+          </div>
+        {% endif %}
+      {% elsif block.type == "interview" %}
+        {% capture interview_mosaic_images %}
+          {% for i in (1..3) %}
+            {% assign setting_handle = 'image_' | append: i %}
+            {% assign image_setting = block.settings[setting_handle] %}
+            {% if image_setting != blank %}
+              {%- assign src = image_setting | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+
+              <div class="interview-mosaic__img interview-mosaic__img--{{ i }}">
+                <img
+                  class="lazyload"
+                  data-src="{{ src }}"
+                  data-widths="[180, 370, 590, 740, 900, 1080, 1296]"
+                  data-aspectratio="{{ image_setting.aspect_ratio }}"
+                  data-sizes="auto"
+                  alt="{{ image_setting.alt | escape }}"
+                />                
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endcapture %}
+
+        {% if interview_mosaic_images != blank %}
+          <div class="interview-mosaic layout-{{ block.settings.layout }}">
+            {{ interview_mosaic_images }}
+          </div>
+        {% endif %}
+
+        <h3>{{ block.settings.title }}</h3>
+        <div class="am90-content">
+          {{ block.settings.content }}
+        </div>
+      {% elsif block.type == "accent_image" %}
+        <div class="am90-accent-image">
+          {%- assign src = block.settings.image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+          <img
+            class="lazyload"
+            data-src="{{ src }}"
+            data-widths="[180, 370, 590, 740, 900, 1080, 1296, 1512, 1728]"
+            data-aspectratio="{{ block.settings.image.aspect_ratio }}"
+            data-sizes="auto"
+            alt="{{ block.settings.image.alt | escape }}"
+          />
+          <noscript>
+            <img src="{{ block.settings.image | img_url: '1024x' }}" alt="{{ block.settings.image.alt | escape }}">
+          </noscript>
+        </div>
+      {% endif %}
+    {% endcapture %}
+
+    {% assign block_html = block_html | strip %}
+
+    {% if block_html != blank %}
+      <div class="am90-block am90-block--{{ block.type | replace: '_', '-' }}" {{ block.shopify_attributes }}>
+        {{ block_html }}
+      </div>
+    {% endif %}
+
+  {% endfor %}
+</div>
+
+{% schema %}
+  {
+    "name": "Undefeated x Nike AM90",
+    "settings": [
+    ],
+    "blocks": [
+      {
+        "type": "hero_image",
+        "name": "Hero Image",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          }
+        ]
+      },
+      {
+        "type": "product_feature",
+        "name": "Product Feature",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "textarea",
+            "id": "content",
+            "label": "Content"
+          },
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Featured Image"
+          },
+          {
+            "type": "header",
+            "content": "Additional Images"
+          },
+          {
+            "type": "image_picker",
+            "id": "additional_image_1",
+            "label": "Image #1"
+          },
+          {
+            "type": "image_picker",
+            "id": "additional_image_2",
+            "label": "Image #2"
+          },
+          {
+            "type": "image_picker",
+            "id": "additional_image_3",
+            "label": "Image #3"
+          }
+        ]
+      },
+      {
+        "type": "product_grid",
+        "name": "Product Grid",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "header",
+            "content": "Grid Items",
+            "info": "Each item represents a product.  The item will link to the selected product only if that item is published on the site.  If set, the specified image will be used, otherwise it will fallback to the first product image.  Same logic applies to the title."
+          },
+          {
+            "type": "header",
+            "content": "Item #1"
+          },
+          {
+            "type": "text",
+            "id": "product_1_title",
+            "label": "Title"
+          },
+          {
+            "type": "product",
+            "id": "product_1",
+            "label": "Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "product_1_image",
+            "label": "Featured Image"
+          },
+          {
+            "type": "header",
+            "content": "Item #2"
+          },
+          {
+            "type": "text",
+            "id": "product_2_title",
+            "label": "Title"
+          },          
+          {
+            "type": "product",
+            "id": "product_2",
+            "label": "Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "product_2_image",
+            "label": "Featured Image"
+          },
+          {
+            "type": "header",
+            "content": "Item #3"
+          },
+          {
+            "type": "product",
+            "id": "product_3",
+            "label": "Product"
+          },
+          {
+            "type": "text",
+            "id": "product_3_title",
+            "label": "Title"
+          },
+          {
+            "type": "image_picker",
+            "id": "product_3_image",
+            "label": "Featured Image"
+          },
+          {
+            "type": "header",
+            "content": "Item #4"
+          },
+          {
+            "type": "text",
+            "id": "product_4_title",
+            "label": "Title"
+          },
+          {
+            "type": "product",
+            "id": "product_4",
+            "label": "Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "product_4_image",
+            "label": "Featured Image"
+          },
+          {
+            "type": "header",
+            "content": "Item #5"
+          },
+          {
+            "type": "text",
+            "id": "product_5_title",
+            "label": "Title"
+          },          
+          {
+            "type": "product",
+            "id": "product_5",
+            "label": "Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "product_5_image",
+            "label": "Featured Image"
+          },
+          {
+            "type": "header",
+            "content": "Item #6"
+          },
+          {
+            "type": "text",
+            "id": "product_6_title",
+            "label": "Title"
+          },
+          {
+            "type": "product",
+            "id": "product_6",
+            "label": "Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "product_6_image",
+            "label": "Featured Image"
+          }
+        ]
+      },
+      {
+        "type": "interview",
+        "name": "Interview",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title"
+          },
+          {
+            "type": "richtext",
+            "id": "content",
+            "label": "Content"
+          },
+          {
+            "type": "header",
+            "content": "Design"
+          },
+          {
+            "type": "select",
+            "id": "layout",
+            "label": "Layout",
+            "options": [
+              {
+                "value": "a",
+                "label": "Layout A"
+              },
+              {
+                "value": "b",
+                "label": "Layout B"
+              }
+            ],
+            "default": "a",
+            "info": "Use layout 'A' if the first image is landscape.  Use 'B' if it is portrait."
+          },
+          {
+            "type": "image_picker",
+            "id": "image_1",
+            "label": "Image #1"
+          },
+          {
+            "type": "image_picker",
+            "id": "image_2",
+            "label": "Image #2"
+          },
+          {
+            "type": "image_picker",
+            "id": "image_3",
+            "label": "Image #3"
+          }
+        ]
+      },
+      {
+        "type": "accent_image",
+        "name": "Accent Image",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
