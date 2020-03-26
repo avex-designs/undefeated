@@ -6,6 +6,7 @@
     {% comment %}<h2 class="h3">{{ 'customer.order.title' | t: name: order.name }}</h2>{% endcomment %}
 
     <p>
+      <span class="date" style="text-transform: uppercase;">{{ order.name }}</span><br />
       <span class="date">{{ 'customer.order.date' | t: date: order.created_at | date: format: 'basic' }}</span>
     </p>
 
@@ -115,12 +116,6 @@
 
 
         <div class="tfoot"> <!-- t foot start -->
-
-          <div> <!-- tr order subtotal start -->
-            <div class="table--small-hide" scope="row" colspan="4"> TAX {% comment %}{{ 'customer.order.subtotal' | t }} {% endcomment %}</div>
-            <div class="taxes">{{ tax_line.price | money }}</div>
-            {% comment %}<div data-label="{{ 'customer.order.subtotal' | t }}">{{ order.line_items_subtotal_price | money }}</div>{% endcomment %}
-          </div> <!-- tr order subtotal end -->
 
           {%- if order.cart_level_discount_applications != blank -%}
             <div> <!-- tr discounts start -->
