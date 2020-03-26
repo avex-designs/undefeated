@@ -1,0 +1,55 @@
+<script>
+var glegem = glegem || function(){(window["glegem"].q = window["glegem"].q || []).push(arguments)};
+glegem("OnCheckoutStepLoaded",function(data){
+ switch(data.StepId){
+  case data.Steps.LOADED:
+      break;
+  case data.Steps.CONFIRMATION:
+     if (data.IsSuccess){
+
+        var totalCartDiscount = 0;
+        var totalOriginalCartDiscount = 0;
+        for(i=0;i<data.details.discounts.length;i++){
+          if(data.details.discounts[i].discountTypeId == 1){
+            totalCartDiscount = totalCartDiscount + data.details.discounts[i].customerPrice;
+            totalOriginalCartDiscount = totalOriginalCartDiscount + data.details.discounts[i].price;
+          }
+        }
+       // Start of GA Ecommerce
+       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+         (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                               })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+       ga('create', 'UA-22545049-1', 'auto');
+
+       ga('require','ecommerce');
+
+       ga('ecommerce:addTransaction', {
+         'id': data.OrderId,
+         'affiliation': 'Global-E',
+         'revenue': data.details.totalProductsPrice - totalOriginalCartDiscount,
+         'shipping': data.details.discountedShippingPrice ,
+         'tax': data.details.totalVAT,
+         'currency': data.details.currency
+       });
+
+       for(i=0;i<data.details.products.length;i++){
+         ga('ecommerce:addItem', {
+           'id': data.OrderId,
+           'name': data.details.products[i].name,
+           'sku':data.details.products[i].sku,
+           'category': data.details.products[i].categories.length ? data.details.products[i].categories[0].name : '',
+           'price': data.details.products[i].price,
+           'quantity': data.details.products[i].quantity,
+           'currency': data.details.currency
+         });
+       }
+       ga('ecommerce:send');
+
+
+       // End of GA Ecommerce
+
+
+     }}});
+</script>
