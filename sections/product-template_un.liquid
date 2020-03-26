@@ -215,16 +215,8 @@
                                     {% endfor %}
 
                                   {% else %}
-                      
-                                  {% comment %}
-                                    {% for value in option.values %}
-                                      {% if option.selected_value == value %} 
-                                      <option value="{{ value | escape }}" selected="selected"> Select {{ option.name }} </option>
-                                      {% else %}
-
-                                      {% endif %}
-                                    {% endfor %}
-                                    {% endcomment %}
+                                    {% comment %} By adding this empty + selected option, we're forcing the user to make a selection {% endcomment %}
+                                    <option value="" selected="selected">Select {{ option.name }}</option>
 
                                     {% for value in option.values %}
                                       {% comment %}
@@ -245,8 +237,6 @@
                                         {% if is_disabled %}
                                           disabled="disabled"
                                           aria-disabled="true"
-                                        {% elsif option.selected_value == value %}
-                                          selected="selected"
                                         {% endif %}
                                       >
                                         {{ value | escape }}{% if is_disabled %} - SOLD OUT{% endif %}
