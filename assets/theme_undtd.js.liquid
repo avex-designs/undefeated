@@ -4374,6 +4374,101 @@ theme.Search = (function() {
   return Search;
 })();
 
+theme.PageAM902020 = (function() {
+  var selectors = {
+    block: '.am90-block',
+    featureSlideshowWrap: '.am90-product-feature__bottom-slideshow-wrap', 
+    featureSlideShow: '.am90-product-feature__bottom-slideshow',
+    slideshowProgress: '.am90-product-feature__bottom-slideshow-progress'
+  };
+
+  function PageAM902020(container) {
+    this.$container = $(container);
+
+    this.initSlideshows();
+    
+    if(window.Shopify && window.Shopify.designMode) {
+      return;
+    }
+
+    this.initFadeIns(); //We dont' need these inside the theme editor
+  }
+
+  PageAM902020.prototype = _.assignIn({}, PageAM902020.prototype, {
+    initSlideshows: function() {
+      $(selectors.featureSlideshowWrap, this.$container).map(function() {
+        var $el = $(this);
+        var $slideshow = $(selectors.featureSlideShow, $el);
+        var $progress = $(selectors.slideshowProgress, $el);
+        var intersectionTimeout;
+
+        function setProgress(slick) {
+          var p = (slick.currentSlide+1) + ' of ' + slick.slideCount;
+          $progress.text(p);
+        }
+
+        function onIntersection(entries, observer) {
+          for (var i = entries.length - 1; i >= 0; i--) {
+            var e = entries[i];
+
+            // Once they've scrolled far enough, go to the next slide so they know it's a slideshow
+            if(e.intersectionRatio > 0.9) {
+              intersectionTimeout = setTimeout(function() {
+                $slideshow.slickNext()
+              }, 500);
+              
+              observer.disconnect(); 
+              break;
+            }
+          }
+        }
+
+        $slideshow.slick({
+          arrows: false,
+          accessibility: false,
+          dots: false,
+          speed: 600,
+          onInit: setProgress,
+          onAfterChange: setProgress
+        });
+
+        var observer;
+
+        if('IntersectionObserver' in window) {
+          observer = new IntersectionObserver(onIntersection, { threshold: 1.0 });
+          observer.observe($slideshow.get(0));
+        }
+
+        return $slideshow;
+      });
+    },
+    initFadeIns: function() {
+      if('IntersectionObserver' in window) {
+        $(selectors.block, this.$container).each(function(i, block) {
+          var $block = $(block);
+
+          function onIntersection(entries, observer) {
+            for (var i = entries.length - 1; i >= 0; i--) {
+              if(entries[i].isIntersecting) {
+                $block.addClass('fade-in-to');
+                observer.disconnect(); 
+                break;
+              }
+            }
+          }
+
+          var observer = new IntersectionObserver(onIntersection, { threshold: 0.05 });
+          observer.observe(block);
+
+          $block.addClass('fade-in')
+        })
+      }
+    }
+  });
+
+  return PageAM902020;
+})();
+
 
 theme.variables = {
   productPageLoad     : false,
@@ -4746,6 +4841,7 @@ $(document).ready(function() {
   sections.register('product-recommendations', theme.ProductRecommendations);
   sections.register('map', theme.Maps);
   sections.register('search', theme.Search);
+  sections.register('page-am90-2020', theme.PageAM902020);
 });
 
 /*
