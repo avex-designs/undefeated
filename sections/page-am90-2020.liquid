@@ -94,7 +94,7 @@
         <h3>{{ block.settings.title }}</h3>
 
         {% capture product_grid_content %}
-          {% for i in (1..6) %}
+          {% for i in (1..9) %}
             {% assign product_setting_handle = 'product_' | append: i %}
             {% assign title_setting_handle = 'product_' | append: i | append: '_title' %}
             {% assign image_setting_handle = 'product_' | append: i | append: '_image' %}
@@ -106,36 +106,38 @@
             {% assign product = all_products[product_handle] %}
 
             {% capture item_image_html %}
-              {% if image != blank %}
-                <img src="{{ image | img_url: '800x' }}" />
-              {% else if product != blank %}
-                <img src="{{ product.featured_image.src | img_url: '800x' }}" />
+              {% if image != nil %}
+                <img src="{{ image | img_url: '800x' }}" data-feat />
+              {% else if product and product.available %}
+                <img src="{{ product.featured_image | img_url: '800x' }}" data-product />
               {% endif %}
             {% endcapture %}
 
-            <div class="am90-product-grid__item">
-              <div class="am90-product-grid__item-gallery">
-                {% if product != blank %}<a href="{{ product.url }}">{% endif %}
-                  {{ item_image_html }}
-                {% if product %}</a>{% endif %}
-              </div>
-
-              {% if product != blank %}
-                <a href="{{ product.url }}" class="am90-product-grid__item-caption">
-              {% else %}
-                <div class="am90-product-grid__item-caption">
-              {% endif %}
-                  {% if title != blank %}
-                    {{ title }}
-                  {% else if product != blank %}
-                    {{ product.title }}
-                  {% endif %}                  
-              {% if product != blank %}
-                </a>
-              {% else %}
+            {% if item_image_html != blank %}
+              <div class="am90-product-grid__item">
+                <div class="am90-product-grid__item-gallery">
+                  {% if product != blank %}<a href="{{ product.url }}">{% endif %}
+                    {{ item_image_html }}
+                  {% if product %}</a>{% endif %}
                 </div>
-              {% endif %} 
-            </div>
+
+                {% if product != blank %}
+                  <a href="{{ product.url }}" class="am90-product-grid__item-caption">
+                {% else %}
+                  <div class="am90-product-grid__item-caption">
+                {% endif %}
+                    {% if title != blank %}
+                      {{ title }}
+                    {% else if product != blank %}
+                      {{ product.title }}
+                    {% endif %}                  
+                {% if product != blank %}
+                  </a>
+                {% else %}
+                  </div>
+                {% endif %} 
+              </div>
+            {% endif %}
           {% endfor %}
         {% endcapture %}
         
@@ -390,6 +392,63 @@
           {
             "type": "image_picker",
             "id": "product_6_image",
+            "label": "Featured Image"
+          },
+          {
+            "type": "header",
+            "content": "Item #7"
+          },
+          {
+            "type": "text",
+            "id": "product_7_title",
+            "label": "Title"
+          },
+          {
+            "type": "product",
+            "id": "product_7",
+            "label": "Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "product_7_image",
+            "label": "Featured Image"
+          },
+          {
+            "type": "header",
+            "content": "Item #8"
+          },
+          {
+            "type": "text",
+            "id": "product_8_title",
+            "label": "Title"
+          },
+          {
+            "type": "product",
+            "id": "product_8",
+            "label": "Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "product_8_image",
+            "label": "Featured Image"
+          },
+          {
+            "type": "header",
+            "content": "Item #9"
+          },
+          {
+            "type": "text",
+            "id": "product_9_title",
+            "label": "Title"
+          },
+          {
+            "type": "product",
+            "id": "product_9",
+            "label": "Product"
+          },
+          {
+            "type": "image_picker",
+            "id": "product_9_image",
             "label": "Featured Image"
           }
         ]
