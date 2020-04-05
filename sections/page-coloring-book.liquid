@@ -1,0 +1,83 @@
+{% capture download_links %}
+  {% for block in section.blocks %}
+    {% if block.type == "download" %}
+      <li {{ block.shopify_attributes }}>
+        <a href="{{ block.settings.url }}" class="coloring-book__link" title="Download '{{ block.settings.title | escape }}'" download>
+          <span class="coloring-book__dl"></span>
+          {{ block.settings.title }}
+        </a>
+      </li>
+    {% endif %}
+  {% endfor %}
+{% endcapture %}
+
+<div id="coloring-book" data-section-id="{{ section.id }}" data-section-type="page-coloring-book">
+  {% if section.settings.hero_image != blank %}
+    {%- assign src = section.settings.hero_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
+    <div class="coloring-book__mob-flush">
+      <div class="coloring-book__hero" style="padding-bottom: {{ 100 | divided_by: section.settings.hero_image.aspect_ratio }}%">
+        <img
+          class="lazyload"
+          data-src="{{ src }}"
+          data-widths="[180, 370, 590, 740, 900, 1080, 1296, 1512, 1728, 2048]"
+          data-aspectratio="{{ section.settings.hero_image.aspect_ratio }}"
+          data-sizes="auto"
+          alt="{{ section.settings.hero_image | escape }}"
+        />
+      </div>
+    </div>
+  {% endif %}
+  <div class="coloring-book__cols">
+    <div class="coloring-book__col coloring-book__col--main">
+      <h1>{{ section.settings.title | default: page.title }}</h1>
+      <div class="coloring-book__content">{{ page.content }}</div>
+    </div>
+    <div class="coloring-book__col coloring-book__col--side">
+      <h4>{{ section.settings.downloads_title }}</h4>
+      <ul class="coloring-book__links">
+        {{ download_links }}
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+  {
+    "name": "Coloring Book",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Title"
+      },
+      {
+        "type": "image_picker",
+        "id": "hero_image",
+        "label": "Hero Image"
+      },
+      {
+        "type": "text",
+        "id": "downloads_title",
+        "label": "Downloads Title"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "download",
+        "name": "Download",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Title" 
+          },
+          {
+            "type": "url",
+            "id": "url",
+            "label": "Link"
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}
