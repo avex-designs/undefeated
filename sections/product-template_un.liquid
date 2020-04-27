@@ -349,32 +349,33 @@
                         </select>
 
                         {% if section.settings.quantity_enabled %}
-                        <div class="product-single__quantity">
-                          <label for="Quantity" class="product-single__quantity-label js-quantity-selector">{{ 'products.product.quantity' | t }}</label>
-                          <input type="number" hidden="hidden" id="Quantity" name="quantity" value="1" min="1" class="js-quantity-selector">
-                        </div>
+                          <div class="product-single__quantity">
+                            <label for="Quantity" class="product-single__quantity-label js-quantity-selector">{{ 'products.product.quantity' | t }}</label>
+                            <input type="number" hidden="hidden" id="Quantity" name="quantity" value="1" min="1" class="js-quantity-selector">
+                          </div>
                         {% endif %}
 
-                        <div class="product-single__add-to-cart{% if section.settings.add_to_cart_button_size == 'large' %} product-single__add-to-cart--full-width{% endif %}">
-                          <button type="submit" name="add" href="#CartDrawer_ATC" id="AddToCart--{{ section.id }}" disabled="disabled" class="disabled btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+                        {%- capture atc_class -%}
+                          product-single__add-to-cart
+                          {% if section.settings.add_to_cart_button_size == 'large' %} product-single__add-to-cart--full-width{% endif %}
+                        {%- endcapture -%}
+                        {% assign atc_id = "AddToCart--" | append: section.id %}
+
+                        <div class="{{ atc_class }}">
+                          <button type="submit" name="add" href="#CartDrawer_ATC" id="{{ atc_id }}" disabled="disabled" class="disabled btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
                             <span class="btn__text">
-                                Select an<br>option
+                              Select an<br>option
                             </span>
-                            {% comment %}
-                            <span class="btn__text">
-                                {{ 'products.product.add_to_cart' | t }}
-                            </span>
-                            {% endcomment %}
                           </button>
                           {% if section.settings.enable_payment_button %}
                             {{ form | payment_button }}
                           {% endif %}
                         </div>
                       {% else %}
-                        <div class="product-single__add-to-cart{% if section.settings.add_to_cart_button_size == 'large' %} product-single__add-to-cart--full-width{% endif %}">
-                          <button type="submit" name="add" id="AddToCart--{{ section.id }}" disabled="disabled" class="disabled btn btn--add-to-cart">
+                        <div class="{{ atc_class }}">
+                          <button type="submit" name="add" id="{{ atc_id }}" disabled="disabled" class="disabled btn btn--add-to-cart sold-out">
                             <span class="btn__text">
-                                Sold Out
+                              Sold<br /> Out
                             </span>
                           </button>
                         </div>
