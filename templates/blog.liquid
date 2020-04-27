@@ -12,7 +12,7 @@
     <ul class="side-post-list">
       {% assign selected_handles = blog.metafields.featured.posts %}
       {% for selected_handle in selected_handles %}
-      <li><a href="{{ articles[selected_handle].url }}">{{ articles[selected_handle].title }}</a></li>
+      <li><a href="{{ articles[selected_handle].url }}">{{ articles[selected_handle].title | replace: '-', '&#8212;' }}</a></li>
       {% endfor %}
     </ul>
 
@@ -20,7 +20,7 @@
     <ul class="side-post-list">
       {% assign selected_handles = blog.metafields.featured.posts_2 %}
       {% for selected_handle in selected_handles %}
-      <li><a href="{{ articles[selected_handle].url }}">{{ articles[selected_handle].title }}</a></li>
+      <li><a href="{{ articles[selected_handle].url }}">{{ articles[selected_handle].title | replace: '-', '&#8212;' }}</a></li>
       {% endfor %}
     </ul>
 
@@ -28,7 +28,7 @@
     <ul class="side-post-list">
       {% assign selected_handles = blog.metafields.featured.posts_3 %}
       {% for selected_handle in selected_handles %}
-      <li><a href="{{ articles[selected_handle].url }}">{{ articles[selected_handle].title }}</a></li>
+      <li><a href="{{ articles[selected_handle].url }}">{{ articles[selected_handle].title | replace: '-', '&#8212;' }}</a></li>
       {% endfor %}
     </ul>
     
