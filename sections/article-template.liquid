@@ -9,7 +9,7 @@
   <article class="grid__item large--five-sixths push--large--one-twelfth article" itemscope itemtype="http://schema.org/Article">
 
     <header class="section-header text-center">
-      <h1>{{ article.title }}</h1>
+      <h1>{{ article.title | replace: '-', '&#8212;' }}</h1>
       <hr class="hr--small">
       <p>
         <span class="date"><time datetime="{{ article.published_at | date: '%Y-%m-%dT%H:%M:%SZ' }}">{{ article.published_at | date: format: 'date' }}</time></span>

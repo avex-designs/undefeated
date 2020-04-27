@@ -3718,7 +3718,7 @@ button.mfp-arrow {
   display: inline-block;
 }
 
-.article__heading-link {
+.article__heading-text {
   color: $colorHeadings;
 }
 
@@ -6636,16 +6636,23 @@ PRODUCT PAGE NOISE
       
         .btn--add-to-cart {
         	text-transform: uppercase;
-            font-family: NHD-55;
-            font-style: inherit;
-            font-size: 1.875rem;
-            padding: 1.125rem 2rem;
-            margin: 0;
-            height: auto;
-            letter-spacing: -.5px;
-            font-weight: 400;
-            text-align: left;
-            line-height: 1;
+          font-family: NHD-55;
+          font-style: inherit;
+          font-size: 1.875rem;
+          padding: 1.125rem 2rem;
+          margin: 0;
+          height: auto;
+          letter-spacing: -.5px;
+          font-weight: 400;
+          text-align: left;
+          line-height: 1;
+
+          &.sold-out {
+            font-family: 'NHD-65';
+            cursor: not-allowed;
+            background-color: $colorBtnPrimary;
+            color: $colorBtnPrimaryText;            
+          }
         }
 
         span.btn__text {
@@ -7181,184 +7188,6 @@ CONTACT PAGE
 
 }
 
-
-/*******************************
-
-LOCATIONS PAGE
-
-*******************************/
-#articles_grid {
-
-    .article__featured-image-link {
-        margin-bottom: 0;
-    }
-
-    .article__featured-image-wrapper {
-        height: 0;
-        overflow: auto;
-        padding-top: 60%;
-
-        img {
-            position: absolute;
-            top: 0;
-            object-fit: cover;
-            width: 100%;
-            height: 100%;
-        }
-    }
-
-    >.grid__items {
-        display: flex;
-        flex-wrap: wrap;
-        width: calc(100% + 2.25rem );
-        margin-right: -1.125rem;
-        margin-left: -1.125rem;
-
-        article {
-            flex: 0 0 50%;
-            padding: 0 1.125rem;
-
-            /*h2 {
-                height: 0;
-                overflow: hidden;
-                margin: 0;
-            }*/
-
-          	h2,
-            .articles-desc {
-                font-size: 2.875rem;
-                line-height: 1;
-                text-transform: uppercase;
-                letter-spacing: -.77px;
-                margin-top: 0.375rem;
-                margin-bottom: 2rem;
-
-                a { font-family: NHD-65; }
-
-                p {
-                    margin-bottom: 3.125rem;
-                }
-            }
-        }
-    }
-
-
-     @include un_mb {
-        .grid__items article {
-            flex: 0 0 100%;
-            padding: 0;
-            
-          	h2,
-            .articles-desc {
-                font-size: 1.875rem;
-                padding-right: 1.125rem;
-                padding-left: 1.125rem;
-            }
-        }
-     }
-
-}
-
-
-
-#shopify-section-page-locations {
-    display: flex;
-
-    #Locash_links {
-        order: 2;
-        white-space: nowrap;
-        padding-left: 2.25rem;
-        width: 100%;
-        max-width: 27.5rem;
-
-        &>div {
-            margin-bottom: 4rem;
-        }
-
-        h4 {
-            font-size: 0.875rem;
-            margin-bottom: 2rem;
-        }
-
-        ul {
-            list-style: none;
-            margin-left: 0;
-            
-            li { margin-bottom: 1.125rem; }
-
-            a {
-                font-size: 1.375rem;
-                text-transform: uppercase;
-                letter-spacing: -.33px;
-                line-height: 1;
-            }
-        }
-    }
-
-
-    @include un_mb {
-
-      flex-wrap: wrap;
-      margin-left: -1.5rem;
-      margin-right: -1.5rem;
-
-      #articles_grid {
-        order: 2;
-      }
-        #Locash_links {
-          display:none;
-          order: 1;
-          padding-left: 1.5rem;
-        }
-    }
-
-
-}
-
-@media screen and (max-width: $undftd-desk ) {
-
-  #articles_grid article h2,
-  #articles_grid article .articles-desc{
-    font-size: 1.8rem !important;
-  }
-
-  #shopify-section-page-locations #Locash_links ul a {
-    font-size: 1rem;
-  }
-
-  #shopify-section-page-locations #Locash_links h4,
-  #shopify-section-page-locations #Locash_links .h4 {
-    font-size: .75rem;
-  }
-
-}
-
-
-@media screen and (max-width: $undftd-mob ) {
-
-#locations main .wrapper {
-    padding: 0;
-}
-
-#locations #articles_grid>.grid__items {
-    width: 100%;
-    margin-right: 0;
-    margin-left: 0;
-}
-
-#locations #articles_grid .articles-desc p {
-    margin-bottom: 2rem;
-}
-
-}
-
-
-
-
-
-
-
-
 /*******************************
 
 GEN TEXT PAGES
@@ -7390,20 +7219,13 @@ GEN TEXT PAGES
 }
 
 
-
-
-
-
-
-
 /*******************************
 
-FEATURED / COLLECTIONS
+FEATURED / COLLECTIONS / Locations
 
 *******************************/
 
-
-.grid-featured>.grid__items {
+.grid-featured > .grid__items {
     display: flex;
     flex-wrap: wrap;
     margin: 0 -1.25rem;
@@ -7412,43 +7234,54 @@ FEATURED / COLLECTIONS
     article.articles.gridzor {
         flex: 0 0 auto;
         width: 100%;
-        padding: 1.25rem;
-
-
-        &:first-child {
-          padding-top: 0 !important;
-        }
+        padding: 0 1.25rem;
+        margin-bottom: 1.25rem;
 
         &.half-zor {
-            width: 50%;
+          width: 50%;
         }
 
-        .article__featured-image-link,
-        h2 {
-          margin-bottom: 0px;
+        h2,
+        .article__featured-image-link {
+          margin-bottom: 0;
           padding-top: .25rem;
         }
 
         .article__featured-image-wrapper {
-            height: 0;
-            overflow: auto;
-            padding-top: 60%;
+          height: 0;
+          overflow: auto;
+          padding-top: 60%;
 
-            img {
-                position: absolute;
-                top: 0;
-                object-fit: cover;
-                width: 100%;
-                height: 100%;
-            }
+          img {
+            position: absolute;
+            top: 0;
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+          }
         }
 
-        a.article__heading-link {
-            font-size: 2.875rem;
+        .article__heading-text,
+        .article-description {
+            // font-size: 2.875rem; // Why was this ever set to something so big?
+            text-transform: uppercase;
+            font-size: 1.8rem;
             letter-spacing: -.77px;
             line-height: 1;
         }
     }
+}
+
+.article-description {
+  margin-top: 25px;
+
+  p {
+    margin-bottom: 25px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 
@@ -7459,23 +7292,28 @@ FEATURED / COLLECTIONS
   margin-bottom: .75rem !important;
   text-transform: uppercase;
   
-  img {margin-left: .5rem;}
+  img {
+    position: relative;
+    top: -2px;
+    margin-left: .5rem;
+  }
   
-  span {
-      font-family: NHD-55;
-      font-size: 1rem;
-      margin-bottom: 1.125rem;
-      cursor: pointer;
+  .select_title,
+  .select {
+    display: inline-block;
+    font-family: NHD-55;
+    font-size: 1rem;
+    margin-bottom: 1.125rem;
+    cursor: pointer;
   }
   
   .selected {
   	font-family: NHD-65;
-    text-decoration: underline;
   }
   
   .toggle_view {
-      display: flex;
-      flex-direction: column;
+    display: flex;
+    flex-direction: column;
   }
   
   .closed { display:none; }
@@ -7487,42 +7325,45 @@ FEATURED / COLLECTIONS
 
 
 .featured-select-list {
-    width: 100%;
-    max-width: 440px;
-    order: 2;
-    padding: 0 1.25rem;
-}
+  // width: 100%;
+  max-width: 440px;
+  order: 2;
+  padding: 0 0 0 2.25rem;
 
-
-.featured-select-list h3 {
+  h3 {
     font-size: 0.875rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
+  }  
 }
+
+
+.featured-select-list 
 
 ul.side-post-list {
-    list-style: none;
-    margin-left: 0;
-    margin-bottom: 4rem;
+  list-style: none;
+  margin-left: 0;
+  line-height: 0.8;
+  font-size: 1.375rem;
+  text-transform: uppercase;
+  letter-spacing: -.33px;    
 
-    li {
-        margin-bottom: 1.125rem;
+  // Add top spacing to the *following* header
+  & + h3 {
+    margin-top: 3rem;
+  }
 
-        a {
-          font-size: 1.375rem;
-          text-transform: uppercase;
-          letter-spacing: -.33px;
-          line-height: 1;
-        }
-    }
+  li {
+    margin-bottom: 0.85rem;
+  }
 }
 
 
 
 @media screen and (max-width: $undftd-desk ) {
 
-  .grid-featured>.grid__items article.articles.gridzor a.article__heading-link {
-    font-size: 1.8rem !important;
-  }
+  // .grid-featured>.grid__items article.articles.gridzor a.article__heading-text {
+  //   font-size: 1.8rem !important;
+  // }
 
   ul.side-post-list li a {
     font-size: 1rem;
@@ -7550,19 +7391,18 @@ ul.side-post-list {
 
 @media screen and (max-width: $undftd-mob ) {
 
-  .grid-featured>.grid__items {
+  .grid-featured >.grid__items {
 
       .half-zor {  width: 100% !important;  }
 
-      a.article__heading-link {  font-size: 1.875rem !important;  }
+      a.article__heading-text {  font-size: 1.875rem !important;  }
 
       article.articles.gridzor {
           padding-right: 0;
           padding-left: 0;
-
-          &:first-child {
-            padding-top: 1.25rem !important;
-          }
+          // &:first-child {
+          //   padding-top: 1.25rem !important;
+          // }
       }
 
       .article_info {
@@ -7592,10 +7432,6 @@ ul.side-post-list {
         display: inline-flex;
       }
   }
-#locations #Blogs_select {
-        display: inline-flex;
-  margin-left: 1.5rem;
-      }
 }
 
 
@@ -8556,7 +8392,7 @@ div#mobile-dropwdown {
 
 
 /*
-.template-blog a.article__heading-link br {
+.template-blog a.article__heading-text br {
     display: none;
 }
 */

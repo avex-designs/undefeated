@@ -15,7 +15,7 @@
   </div>
 {% endif %}
 <h2 class="h3{% if section.settings.post_limit == 1 and section.settings.blog_show_image == false %} title--one-post{% endif %}">
-  <a class="article__heading-link" href="{{ article.url }}">{{ article.title }}</a>
+  <a class="article__heading-text" href="{{ article.url }}">{{ article.title }}</a>
 </h2>
 {% if section.settings.blog_show_excerpt %}
   <div class="rte rte--indented-images">
