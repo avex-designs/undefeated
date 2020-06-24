@@ -1,0 +1,42 @@
+<section>
+  {% if section.blocks.size > 0 %}
+    <div class="content-grid" style="display: flex;">
+      {% for block in section.blocks %}
+        {% if block.settings.product != blank %}
+          {% assign product = all_products[block.settings.product] %}
+
+          <div {{ block.shopify_attributes }}>
+            {% include 'product-grid-item' %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+{% schema %}
+  {
+    "name": "Product Grid",
+    "max_blocks": 4,
+    "blocks": [
+      {
+        "type": "product",
+        "name": "Product",
+        "settings": [
+          {
+            "id": "product",
+            "type": "product",
+            "label": "Product"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Product Grid",
+        "category": "Product",
+        "blocks": []
+      }
+    ]
+  }
+{% endschema %}

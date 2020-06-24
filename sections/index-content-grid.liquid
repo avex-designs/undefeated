@@ -1,0 +1,96 @@
+<section>
+  {% if section.blocks.size > 0 %}
+    <div class="content-grid" style="display: flex;">
+      {% for block in section.blocks %}
+        <div {{ block.shopify_attributes }}>
+
+          {% if block.settings.link %}
+            <a href="{{ block.settings.link }}">
+          {% else %}  
+            <span class="non_link">
+          {% endif %}
+            
+            <div style="position: relative;">
+              <img src="{{ block.settings.image | img_url: '800x' }}" alt="{{ block.settings.image.alt }}">
+              {% if block.settings.video_url %}
+              <!-- 
+                <div style="position: absolute; z-index: 1; top: 0; left: 0; height: 100%; width: 100%;">
+                <iframe src="https://player.vimeo.com/video/{{ block.settings.video_url.id }}?background=1&autoplay=1&loop=1&byline=0&title=0"
+           frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; object-fit: cover;"></iframe>
+                </div>
+              -->
+              {% endif %}
+            </div>
+
+          {% if block.settings.link %}
+            </a>
+          {% else %}
+            </span>
+          {% endif %}
+          
+          <div>
+            {% if block.settings.link %}
+              <a href="{{ block.settings.link }}">
+            {% else %}  
+              <span class="non_link">
+            {% endif %}
+                
+                <h3>{{ block.settings.title }}</h3>
+
+            {% if block.settings.link %}
+              </a>
+            {% else %}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+{% schema %}
+  {
+    "name": "Content Grid",
+    "max_blocks": 4,
+    "blocks": [
+      {
+        "type": "grid_item",
+        "name": "Grid Item",
+        "settings": [
+          {
+            "id": "title",
+            "type": "text",
+            "label": "Title",
+            "default": "Default title",
+            "info": "HTML is accepted"
+          },
+          {
+            "id": "url",
+            "type": "url",
+            "label": "Link to URL"
+          },
+          {
+            "id": "image",
+            "type": "image_picker",
+            "label": "Image"
+          },
+          {
+            "id": "video_url",
+            "type": "video_url",
+            "label": "Video URL",
+            "accept": ["vimeo"],
+            "info": "Vimeo only please"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Content Grid",
+        "category": "Content",
+        "blocks": []
+      }
+    ]
+  }
+{% endschema %}
