@@ -37,24 +37,24 @@
         <span class="select_title">All Posts</span>
         <img src="{{ 'filter-down.svg' | file_url }}"/>
       </span>
-    	<div class="toggle_view closed">
-      	<span class="select" data-title="All Posts" data-category="all">All Posts</span>
+      <div class="toggle_view closed">
+        <span class="select" data-title="All Posts" data-category="all">All Posts</span>
         {% assign title_1 = blog.metafields.featured.sidebar_title %}
         {% assign title_2 = blog.metafields.featured.sidebar_title_2 %}
         {% assign title_3 = blog.metafields.featured.sidebar_title_3 %}
 
         {% if title_1 != blank %}
-      	 <span class="select" data-category="{{ title_1 }}">{{ title_1 }}</span>
+         <span class="select" data-category="{{ title_1 }}">{{ title_1 }}</span>
         {% endif %}
 
         {% if title_2 != blank %}
-      	 <span class="select" data-category="{{ title_2 }}">{{ title_2 }}</span>
+         <span class="select" data-category="{{ title_2 }}">{{ title_2 }}</span>
         {% endif %}
 
         {% if title_3 != blank %}
-      	 <span class="select" data-category="{{ title_3 }}">{{ title_3 }}</span>
+         <span class="select" data-category="{{ title_3 }}">{{ title_3 }}</span>
         {% endif %}
-    	</div>
+      </div>
     </div>
     
 
