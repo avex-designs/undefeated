@@ -1,8 +1,8 @@
 <section>
   {% if section.blocks.size > 0 %}
-    <div class="content-grid" style="display: flex;">
+    <div class="content-grid content-grid--{{ section.blocks.size }}-col">
       {% for block in section.blocks %}
-        <div {{ block.shopify_attributes }}>
+        <div class="content-grid__item {{ block.shopify_attributes }}">
 
           {% if block.settings.link %}
             <a href="{{ block.settings.link }}">
@@ -88,7 +88,7 @@
     "presets": [
       {
         "name": "Content Grid",
-        "category": "Content",
+        "category": "Undefeated",
         "blocks": []
       }
     ]

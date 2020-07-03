@@ -65,7 +65,10 @@
             {%- if filter_collection and filter_collection.all_products_count != '' and filter_collection.all_products_count > 0 and filter_collection.title != nil and filter_collection.title != '' -%}
             <li class="collection-container filter-active-{{ filter_collection.handle }} {% if tag_list contains menu_item %}active{% endif %} {% if current_tags contains menu_item or current_collection_handle == menu_item %}selected{% endif %} {%- unless current_tags or settings.pt_show_collection_count == false -%}has_collection_counts{%- endunless -%}">
                 <div class="collection-name">
-                    <a href="/collections/{{ menu_item }}" title="{{ filter_collection.title | escape }}"><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>{%- unless current_tags -%}<span class="collection-count">({{ filter_collection.all_products_count }})</span>{%- endunless -%}
+                    <a href="/collections/{{ menu_item }}" title="{{ filter_collection.title | escape }}" >
+                      <i class="check-icon"></i> {{ filter_collection.title | escape }}
+                    </a>
+                    {%- unless current_tags -%}<span class="collection-count">({{ filter_collection.all_products_count }})</span>{%- endunless -%}
                 </div>
             </li>
             {%- endif -%}
@@ -143,7 +146,9 @@
                     {%- elsif current_collection_handle == menu_item -%}
                     <a href="/collections/all{%- if current_tags -%}/{{ current_tags | join: '+' }}{%- endif -%}" title="{{ filter_collection.title | escape }}"><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>
                     {%- else -%}
-                    <a href="/collections/{{ menu_item }}" title="{{ filter_collection.title | escape }}"><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>
+                    <a href="/collections/{{ menu_item }}" title="{{ filter_collection.title | escape }}">
+                      <i class="check-icon"></i> {{ filter_collection.title | escape }}
+                    </a>
                     {%- endif -%}
                     <span class="collection-count">({{ filter_collection.all_products_count }})</span>
                   </div>
@@ -177,13 +182,19 @@
                   <div class="collection-name">
                       {%- if current_tags contains menu_item -%}{{ '<i class="check-icon"></i> ' | append: filter_collection.title | link_to_remove_tag: menu_item }}
                       {%- elsif current_collection_handle == menu_item -%}
-                      <a href="/collections/all{%- if current_tags -%}/{{ current_tags | join: '+' }}{%- endif -%}" title="{{ filter_collection.title | escape }}"><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>
+                      <a href="/collections/all{%- if current_tags -%}/{{ current_tags | join: '+' }}{%- endif -%}" title="{{ filter_collection.title | escape }}">
+                        <i class="check-icon"></i> {{ filter_collection.title | escape }}
+                      </a>
                       {%- else -%}
                       {%- assign replacer_tags = cleared_tags_handle | append: '|' | append: menu_item | remove_first: '|' | split: '|' | uniq | join: '+' -%}
                       {%- if current_collection_handle == 'all' or current_collection_handle_sep == 'all' -%}
-                    	<a href="/collections/{{ menu_item }}{%- unless '|' == cleared_tags or '' == cleared_tags -%}/{{ cleared_tags }}{%- endunless -%}" title="{{ filter_collection.title | escape }}"><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>
+                    	<a href="/collections/{{ menu_item }}{%- unless '|' == cleared_tags or '' == cleared_tags -%}/{{ cleared_tags }}{%- endunless -%}" title="{{ filter_collection.title | escape }}">
+                        <i class="check-icon"></i> {{ filter_collection.title | escape }}
+                      </a>
                       {%- else -%}
-                    	<a href="/collections/{{ current_collection_handle_sep }}/{{ replacer_tags }}" title="{{ filter_collection.title | escape }}"><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>
+                    	<a href="/collections/{{ current_collection_handle_sep }}/{{ replacer_tags }}" title="{{ filter_collection.title | escape }}">
+                        <i class="check-icon"></i> {{ filter_collection.title | escape }}
+                      </a>
                       {%- endif -%}
                    	  {%- endif -%}
                     {%- unless current_tags or current_collection_handle_sep != 'all' -%}<span class="collection-count">({{ filter_collection.all_products_count }})</span>{%- endunless -%}
@@ -211,9 +222,10 @@
                 <div class="collection-name">
                     {%- if current_tags contains menu_item -%}{{ '<i class="check-icon"></i> ' | append: filter_collection.title | link_to_remove_tag: menu_item }}
                     {%- elsif current_collection_handle == menu_item -%}
-                    <a href="/collections/all{%- if current_tags -%}/{{ current_tags | join: '+' }}{%- endif -%}" title="{{ filter_collection.title | escape }}"><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>
+                    <a href="/collections/all{%- if current_tags -%}/{{ current_tags | join: '+' }}{%- endif -%}" title="{{ filter_collection.title | escape }}">
+                      <i class="check-icon"></i> {{ filter_collection.title | escape }}</a>
                     {%- elsif current_collection_handle == 'all' -%}
-                    <a href="/collections/{{ menu_item }}{%- if current_tags -%}/{{ current_tags | join: '+' }}{%- endif -%}" title="{{ filter_collection.title | escape }}"><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>{%- unless current_tags -%}<span class="collection-count">({{ filter_collection.all_products_count }})</span>{%- endunless -%}
+                    <a href="/collections/{{ menu_item }}{%- if current_tags -%}/{{ current_tags | join: '+' }}{%- endif -%}" title="{{ filter_collection.title | escape }}" {% if filter_collection.handle == 'sale' %}style="color: red"{% endif %}><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>{%- unless current_tags -%}<span class="collection-count">({{ filter_collection.all_products_count }})</span>{%- endunless -%}
                     {%- else -%}{{ '<i class="check-icon"></i> ' | append: filter_collection.title | link_to_add_tag: menu_item }}{%- endif -%}
                 </div>
             </li>

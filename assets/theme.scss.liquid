@@ -9367,3 +9367,55 @@ div#mobile-dropwdown {
     }
   }
 }
+
+/*
+  Content grid for the homepage
+*/
+
+.content-grid {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-left: -$undftd-wrapper-gutter-desk/2;
+  margin-right: -$undftd-wrapper-gutter-desk/2;
+}
+
+// Default is to do 3 across -> 4 across on mobile up screens
+// Add support for 2 and 4 across using a modifier class on the parent .content-grid
+.content-grid__item {
+  flex: 1;
+  flex-basis: percentage(1);
+  max-width: percentage(1);
+  padding: 0 $undftd-wrapper-gutter-desk/2;
+
+  @media screen and (min-width: $undftd-mob ) {
+    flex-basis: percentage(1/3);
+    max-width: percentage(1/3);
+
+    .content-grid--2-col & {
+      @include flex-basis(percentage(1/2));
+      max-width: percentage(1/2);
+    }
+
+    .content-grid--4-col & {
+      @include flex-basis(percentage(1/4));
+      max-width: percentage(1/4);
+    }    
+  }
+
+  @media screen and (min-width: $undftd-sm-desk ) {
+    flex-basis: percentage(1/4);
+    max-width: percentage(1/4);
+
+    .content-grid--2-col & {
+      @include flex-basis(percentage(1/2));
+      max-width: percentage(1/2);
+    }
+
+    .content-grid--3-col & {
+      @include flex-basis(percentage(1/3));
+      max-width: percentage(1/3);
+    }     
+  }
+}

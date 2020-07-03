@@ -1,0 +1,44 @@
+<section>
+  {% assign collection = collections[section.settings.collection] %}
+  {% assign limit = section.settings.limit | plus: 0 %}
+
+  {% if collection and collection.products.size > 0 %}
+    <div class="content-grid content-grid--4-col">
+      {% for product in collection.products limit: limit %}
+        <div class="content-grid__item">
+          {% include 'product-grid-item' %}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+{% schema %}
+  {
+    "name": "Collection Grid",
+    "settings": [
+      {
+        "id": "collection",
+        "type": "collection",
+        "label": "Collection"
+      },
+      {
+        "id": "limit",
+        "type": "select",
+        "label": "Products To Show",
+        "options": [
+          { "value": "4", "label": "4" },
+          { "value": "8", "label": "8" },
+          { "value": "12", "label": "12" },
+          { "value": "16", "label": "16" }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Collection Grid",
+        "category": "Undefeated"
+      }
+    ]
+  }
+{% endschema %}

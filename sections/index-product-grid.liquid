@@ -1,11 +1,11 @@
 <section>
   {% if section.blocks.size > 0 %}
-    <div class="content-grid" style="display: flex;">
+    <div class="content-grid content-grid--{{ section.blocks.size }}-col">
       {% for block in section.blocks %}
         {% if block.settings.product != blank %}
           {% assign product = all_products[block.settings.product] %}
 
-          <div {{ block.shopify_attributes }}>
+          <div class="content-grid__item" {{ block.shopify_attributes }}>
             {% include 'product-grid-item' %}
           </div>
         {% endif %}
@@ -34,7 +34,7 @@
     "presets": [
       {
         "name": "Product Grid",
-        "category": "Product",
+        "category": "Undefeated",
         "blocks": []
       }
     ]
