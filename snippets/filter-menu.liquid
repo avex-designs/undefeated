@@ -213,7 +213,7 @@
                     {%- elsif current_collection_handle == menu_item -%}
                     <a href="/collections/all{%- if current_tags -%}/{{ current_tags | join: '+' }}{%- endif -%}" title="{{ filter_collection.title | escape }}"><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>
                     {%- elsif current_collection_handle == 'all' -%}
-                    <a href="/collections/{{ menu_item }}{%- if current_tags -%}/{{ current_tags | join: '+' }}{%- endif -%}" title="{{ filter_collection.title | escape }}"><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>{%- unless current_tags -%}<span class="collection-count">({{ filter_collection.all_products_count }})</span>{%- endunless -%}
+                    <a href="/collections/{{ menu_item }}{%- if current_tags -%}/{{ current_tags | join: '+' }}{%- endif -%}" title="{{ filter_collection.title | escape }}" {% if filter_collection.handle == 'sale' %}style="color: red"{% endif %}><i class="check-icon"></i> {{ filter_collection.title | escape }}</a>{%- unless current_tags -%}<span class="collection-count">({{ filter_collection.all_products_count }})</span>{%- endunless -%}
                     {%- else -%}{{ '<i class="check-icon"></i> ' | append: filter_collection.title | link_to_add_tag: menu_item }}{%- endif -%}
                 </div>
             </li>
