@@ -1,0 +1,83 @@
+<section data-section-id="{{ section.id }}" data-section-type="kobe-videos">
+  <div style="text-align: center">
+    <h2>{{ section.settings.title }}</h2>
+    <div>
+      {{ section.settings.subtitle }}
+    </div>
+    <div style="height: 80vh; background-color: #DDD">
+      <!--  -->
+    </div>
+    <div style="display: flex; align-items: center; justify-content: center;">
+      {% for i in (1..13) %}
+        {% assign num = forloop.index | prepend: '00' | slice: -2, 2 %}
+        {% assign snippet_title = 'UND-KOBE-NUMBERS-SVG-' | append: num %}
+        <div style="width: 100px">
+          {% include snippet_title %}
+        </div>
+      {% endfor %}
+    </div>
+    <h3>{{ section.settings.footer_title }}</h3>
+    <h5>{{ section.settings.footer_subtitle }}</h5>
+    <div>{{ section.settings.footer_subsubtitle }}</div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Kobe - Videos",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "type": "richtext",
+      "id": "subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "header",
+      "content": "Videos Footer"
+    },      
+    {
+      "type": "text",
+      "id": "footer_title",
+      "label": "Title"
+    },
+    {
+      "type": "text",
+      "id": "footer_subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "richtext",
+      "id": "footer_subsubtitle",
+      "label": "Subsubtitle"
+    }    
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "url",
+          "id": "video_file_url",
+          "label": "Video File URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Videos",
+      "category": "Kobe",
+      "settings": {
+        "title": "Do it for Kobe!"
+      },
+      "blocks": []
+    }
+  ]
+}
+{% endschema %}
