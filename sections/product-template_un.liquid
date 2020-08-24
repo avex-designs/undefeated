@@ -266,7 +266,7 @@
                                             var selectedFilter = selectedColor.replace(' ', '');
                                             var onLoadSelect = selectedFilter.toLowerCase()
                                             $('.product-single__photo--flex-wrapper').hide();
-                                            $('[data-variant='+onLoadSelect+']').fadeIn('slow');
+                                            $('[data-variant="'+onLoadSelect+'"]').fadeIn('slow');
 
                                             console.log('page load - filter colors images / above 991 - PDP');
                                         }
@@ -276,14 +276,14 @@
                                             var selectedColor = $(this).val().toLowerCase();
                                             var selectedFilter = selectedColor.replace(' ', '');
                                             $('.product-single__photo--flex-wrapper').hide();
-                                            $('[data-variant='+selectedFilter+']').fadeIn('slow');
+                                            $('[data-variant="'+selectedFilter+'"]').fadeIn('slow');
 
                                             //console.log(selectedColor + ' change colors image - above 991 - PDP' );
                                             //console.log(selectedFilter + ' change colors image - above 991 - PDP');
                                             console.log('change colors image - above 991 - PDP');
 
                                             var onLoadSelect = selectedFilter.toLowerCase();
-                                            var yanana = $('[data-variant='+onLoadSelect+'] img')
+                                            var yanana = $('[data-variant="'+onLoadSelect+'"] img');
 
                                             $('.product-single__photos').magnificPopup({
                                                 delegate: yanana,
