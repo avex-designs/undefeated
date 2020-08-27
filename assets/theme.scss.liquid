@@ -9367,3 +9367,255 @@ div#mobile-dropwdown {
     }
   }
 }
+
+/*
+  Kobe content for the homepage
+*/
+
+.template-index {
+  .page-container {
+    max-width: none;
+  }
+  .site-footer {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.kobe-flush {
+  @media screen and (min-width: $undftd-mob ) {
+    margin: 0 -#{$undftd-wrapper-gutter-sm-desk};
+  }
+
+  @media screen and (min-width: $undftd-sm-desk) {
+    margin: 0 -#{$undftd-wrapper-gutter-desk};
+  }
+}
+
+.kobe {
+  text-align: center;
+
+  h2, h3 {
+    font-weight: bold;
+    font-family: 'NHD-65';
+    text-transform: uppercase;
+  }
+
+  .videos-display {
+    background-color: black;
+    position: relative;
+    height: 80vh;
+    max-height: 136vw;
+    margin: 20px 0;
+    opacity: 0;
+    transition: opacity 1s ease-out;
+
+    &.is-ready {
+      opacity: 1;
+    }
+
+    @media screen and (min-width: $undftd-mob ) {
+      max-height: 62vw;
+    }
+
+    @media screen and (min-width: $undftd-sm-desk) {
+      max-height: 42vw;
+      min-height: 500px;
+      margin-top: 80px;
+    }
+  }
+
+  .video-player {
+    position: absolute;
+    display: flex;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 500ms ease-in-out;
+
+    &.is-active {
+      opacity: 1;
+      transition-duration: 250ms;
+    }
+
+    video {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 300ms ease-out;
+
+      &.is-playing {
+        opacity: 1;
+      }
+
+      &:nth-child(2),
+      &:nth-child(3) {
+        display: none;
+      }
+
+      @media screen and (min-width: 800px ) {
+        width: 50%;
+
+        &:nth-child(2) {
+          display: block;
+        }
+      }
+
+      @media screen and (min-width: $undftd-sm-desk) {
+        width: 33.3333%;
+
+        &:nth-child(3) {
+          display: block;
+        }        
+      }      
+    }
+  }
+}
+
+.kobe-title {
+  margin-top: 20px;
+  font-size: 3rem;
+  letter-spacing: 0.06em;
+
+  @media screen and (min-width: $undftd-sm-desk) {
+    margin-top: 50px;
+  }
+}
+
+.kobe-subtitle {
+  letter-spacing: 0.03em;
+
+  p {
+    margin-bottom: 0;
+  }
+}
+
+.kobe-numbers-mobile {
+  @media screen and (min-width: $undftd-mob ) {
+    display: none;
+  }
+}
+
+.kobe-numbers-desk {
+  display: none;
+
+  @media screen and (min-width: $undftd-mob ) {
+    @include display-flexbox;
+    @include align-items(center);
+    @include justify-content(center);
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+  }
+
+  .kobe-num {
+    width: 80px;
+  }
+}
+
+.kobe-num {
+  cursor: pointer;
+  filter: grayscale(1);
+  -webkit-filter: grayscale(1);
+          filter: grayscale(1);
+  transition: filter 250ms ease-out, -webkit-filter 250ms ease-out;
+
+  &.is-active {
+    cursor: auto;
+    -webkit-filter: grayscale(0);
+            filter: grayscale(0);
+  }
+
+  .is-transitioning & {
+    cursor: auto;
+  }
+}
+
+.kobe-footer {
+  margin-top: 20px;
+}
+
+.kobe-footer__title {
+  font-size: 1.4rem;
+  letter-spacing: 0.09em;
+  margin: 0;
+
+  @media screen and (min-width: $undftd-sm-desk) {
+    font-size: 2.4rem;
+  }
+}
+
+.kobe-footer__subtitle {
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+  max-width: 18em;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media screen and (min-width: $undftd-sm-desk) {
+    font-size: 1.85rem;
+    max-width: none;
+  }  
+}
+
+.kobe-slider {
+  height: 100%;
+  height: 75vh;
+  max-height: 450px;
+  margin: 50px 0;
+
+  @media screen and (min-width: $undftd-mob) {
+    max-height: 600px;
+  }
+
+  @media screen and (min-width: $undftd-sm-desk) {
+    height: 100vh;
+    max-height: 700px;
+    margin: 200px 0;    
+  }
+
+  .slick-list,
+  .slick-track {
+    height: 100%;
+  }
+
+  img {
+    cursor: pointer;
+  }
+}
+
+.kobe-slide {
+  height: 100%;
+  background-color: #FFF;
+
+  @media screen and (min-width: $undftd-sm-desk) {
+    padding: 0 $undftd-wrapper-gutter-desk;
+  }
+}
+
+.kobe-slide__image {
+  height: 100%;
+  width: 100%;
+
+  img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+  }  
+}
+
+.kobe-product-title {
+  letter-spacing: 0.07em;
+  margin-bottom: 50px;
+
+  @media (min-width: 600px) {
+    br {
+      display: none;
+    }
+  }
+}

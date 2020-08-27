@@ -4469,6 +4469,307 @@ theme.PageAM902020 = (function() {
   return PageAM902020;
 })();
 
+theme.KobeVideos = (function() {
+  var selectors = {
+    number: '[data-number]',
+    player: '[data-player]',
+    numbersSlideshow: '[data-numbers-slideshow]',
+    display: '[data-videos-display]'
+  };
+
+  var classes = {
+    isTransitioning: 'is-transitioning',
+    playerReady: 'is-ready',
+    displayReady: 'is-ready'
+  };
+
+  function KobeVideos(container) {
+    this.$container = $(container);
+    
+    this.currentIndex = null;
+    this.isTransitioning = false;
+
+    this.$display = $(selectors.display, this.$container);
+    this.$players = $(selectors.player, this.$container);
+    // this.$numbers = $(selectors.number, this.$container);
+    this.$numbersSlideshow = $(selectors.numbersSlideshow, this.$container);
+
+    this.$numbersSlideshow.slick({
+      slidesToShow: 7,
+      arrows: false,
+      speed: 500,
+      accessibility: false,
+      swipe: Modernizr.touch,
+      swipeToSlide: true,
+      centerMode: true,
+      onAfterChange: this.onAfterNumberChange.bind(this),
+      infinite: true,
+      responsive: [
+        {
+          breakpoint: 900,
+          settings: {
+            slidesToShow: 5
+          }
+        },      
+        {
+          breakpoint: 600,
+          settings: {
+            slidesToShow: 3
+          }
+        }
+      ]
+    });
+
+    this.$container.on('click', selectors.number, this.onNumberClick.bind(this));
+    $(window).on('resize', theme.debounce(this.onResize.bind(this), 250));
+
+    this.switchTo(0);
+  }
+
+  KobeVideos.prototype = _.assignIn({}, KobeVideos.prototype, {
+    getLoopIndex(i) {
+      var loopI = i;
+
+      if (loopI < 0 || loopI > this.$players.length-1) {
+        loopI = 0;
+      }
+
+      return loopI;
+    },
+
+    getCurrentPlayer: function() {
+      if (this.currentIndex != null) {
+        return this.$players.eq(this.currentIndex);  
+      }
+      else {
+        return null;
+      }
+    },
+
+    setTransitioning: function(state) {
+      this.isTransitioning = !!state;
+      this.$container.toggleClass(classes.isTransitioning, !!state)
+    },
+
+    switchTo: function(index) {
+      if (index === this.currentIndex || index > this.$players.length || index < 0) {
+        return;
+      }
+
+      this.setTransitioning(true);
+
+      var self = this;
+
+      var $currentPlayer = this.getCurrentPlayer();
+
+      if ($currentPlayer) {
+        $currentPlayer.removeClass('is-active');
+        $currentPlayer.find('video').off('ended');
+    
+        setTimeout(function() {
+          $currentPlayer.find('video').each(function(i, video) {
+            video.pause();
+            video.currentTime = 0;
+
+            // unload
+            // $source.attr('data-src', $source.data('src'));
+            // $source.attr('data-src', null);            
+          });        
+        }, 500);        
+      }
+
+      var $player = this.$players.eq(index);
+
+      var firstVideo = $player.find('video').first().get(0);
+
+      $player.find('video').each(function(i, video) {
+        var $video = $(video);
+        var $source = $video.find('source[data-src]');
+
+        video.currentTime = 0;
+
+        $video.one('load', function() {
+          // console.log('playing inside load statement');
+          video.play();
+        });
+
+        $video.one('play', function() {
+          if (i != 0) {
+            video.currentTime = firstVideo.currentTime || 0;  
+          }
+          
+          $video.addClass('is-playing');
+          self.$display.addClass(classes.displayReady);          
+        });        
+
+        $video.one('ended', function() {
+          self.switchTo(self.getLoopIndex(index+1));
+        });
+
+        if ($video.is(':visible')) {
+          if ($source.attr('data-src')) {
+            $source.attr('src', $source.data('src'));
+            $source.attr('data-src', null);
+            video.load();  
+          }
+          else {
+            // console.log('playing inside video visible statement');
+           video.play();
+          }
+        }
+      });
+
+      $player.addClass('is-active');
+
+      setTimeout(function() {
+        this.setTransitioning(false);
+      }.bind(this), 250);
+
+      if (this.currentIndex === 0 && index === this.$players.length - 1) {
+        // go back one slide
+        this.$numbersSlideshow.slickPrev();
+      }
+      else if (this.currentIndex === this.$players.length -1 && index === 0) {
+        // go forward one slide
+        this.$numbersSlideshow.slickNext();
+      }
+      else {
+        this.$numbersSlideshow.slickGoTo(index);  
+      }
+
+      // Find the numbers, can't cache on init because the slideshow duplicates
+      this.$container.find(selectors.number)
+        .removeClass('is-active')
+        .filter(function(i, el) {
+          return $(el).data('number') === index+1;
+        }).addClass('is-active');
+
+      this.currentIndex = index;
+    },
+
+    onResize: function() {
+      var $currentPlayer = this.getCurrentPlayer();
+
+      if (!$currentPlayer) return;
+
+      // The first video is always visible
+      var firstVideo = $currentPlayer.find('video').first().get(0);
+
+      $currentPlayer.find('video').each(function(i, video) {
+        if (i == 0) return; // First video is always visible no matter what
+
+        var $video = $(video);
+        var $source = $video.find('source');
+
+        if ($video.is(':visible') && $source.attr('data-src')) {
+          $video.one('play', function() {
+            video.currentTime = firstVideo.currentTime || 0;
+          });
+
+          $source.attr('src', $source.data('src'));
+          $source.attr('data-src', null);
+          video.load();  
+        }
+        else if (!$video.is(':visible') && $source.attr('src')) {
+          $source.attr('data-src', $source.data('src'));
+          $source.attr('src', null);
+        }
+      });
+    },
+
+    onAfterNumberChange: function(slick, index) {
+      if (this.currentIndex != null) {
+        this.switchTo(index)
+      }
+    },
+
+    onNumberClick: function(e) {
+      e.preventDefault();
+
+      if (this.isTransitioning) return;
+
+      var index = $(e.currentTarget).data('number') - 1;
+      this.switchTo(index);
+    }
+  });
+
+  return KobeVideos;
+})();
+
+theme.KobeProduct = (function() {
+  var selectors = {
+    slideshow: '[data-slideshow]'
+  };
+
+  function KobeProduct(container) {
+    this.$container = $(container);
+
+    this.$slideshow = $(selectors.slideshow, this.$container);
+
+    this.observer = null;
+
+    // Load the slideshow images
+    this.$container.find('img').each(function(i, img) {
+      var $img = $(img);
+
+      if ($img.data('src')) {
+        $img.attr('src', $img.data('src'));
+        $img.attr('data-src', null);
+      }
+
+      if ($img.data('srcset')) {
+        $img.attr('srcset', $img.data('srcset'));
+        $img.attr('data-srcset', null);
+      }
+    });
+
+    this.$slideshow.slick({
+      arrows: false,
+      accessibility: false,
+      dots: false,
+      speed: Modernizr.touch ? 600 : 1200,
+      fade: !Modernizr.touch,
+      autoplay: false,
+      autoplaySpeed: 3500,
+      swipe: Modernizr.touch
+    });
+
+    this.$slideshow.on('click', 'img', function(e) {
+      this.$slideshow.slickPause();
+      this.$slideshow.slickNext();
+    }.bind(this));    
+
+    if('IntersectionObserver' in window) {
+      this.observer = new IntersectionObserver(this.onIntersection.bind(this), { threshold: 0.75 });
+      this.observer.observe(this.$slideshow.get(0));
+    }
+    else {
+      this.$slideshow.slickPlay();
+    }
+  }
+
+  KobeProduct.prototype = _.assignIn({}, KobeProduct.prototype, {
+    onIntersection: function(entries, observer) {
+      var self = this;
+
+      for (var i = entries.length - 1; i >= 0; i--) {
+        if(entries[i].intersectionRatio >= 0.75) {
+          setTimeout(function() {
+            self.$slideshow.slickNext();
+            
+            if (!Modernizr.touch) {
+              self.$slideshow.slickPlay();
+            }
+          }, 1200);
+          this.observer.disconnect(); 
+          break;
+        }
+      }
+    }
+  });
+
+  return KobeProduct;
+})();
 
 theme.variables = {
   productPageLoad     : false,
@@ -4842,6 +5143,8 @@ $(document).ready(function() {
   sections.register('map', theme.Maps);
   sections.register('search', theme.Search);
   sections.register('page-am90-2020', theme.PageAM902020);
+  sections.register('kobe-videos', theme.KobeVideos);
+  sections.register('kobe-product', theme.KobeProduct);
 });
 
 /*

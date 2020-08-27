@@ -1,0 +1,77 @@
+<section data-section-id="{{ section.id }}" data-section-type="kobe-product">
+  <div class="kobe">
+    <div class="kobe-flush">
+      <div class="kobe-slider" data-slideshow>
+        {% for block in section.blocks %}
+          <div class="kobe-slide">
+            <div class="kobe-slide__image">
+              <img 
+                data-srcset="{{ block.settings.image | img_url: '400x' }} 400w,
+                             {{ block.settings.image | img_url: '700x' }} 700w,
+                             {{ block.settings.image | img_url: '900x' }} 900w,
+                             {{ block.settings.image | img_url: '1100x' }} 1100w,
+                             {{ block.settings.image | img_url: '1300x' }} 1300w,
+                             {{ block.settings.image | img_url: '1400x' }} 1400w,
+                             {{ block.settings.image | img_url: '1500x' }} 1500w
+                            "
+                   sizes="100vw"
+                   data-src="{{ block.settings.image | img_url: '1500x' }}"
+                   alt="{{ block.settings.image.alt | escape }}"
+              />              
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="wrapper" style="padding-bottom: 200px">
+      {% if section.settings.title %}
+        <div class="kobe-product-title">{{ section.settings.title }}</div>
+      {% endif %}
+      {% if section.settings.logo %}
+        <img src="{{ section.settings.logo | img_url: '400x' }}" style="width: 200px" />
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Kobe - Product",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product",
+      "category": "Kobe",
+      "settings": {
+        "title": "What if?"
+      },
+      "blocks": []
+    }
+  ]
+}
+{% endschema %}
