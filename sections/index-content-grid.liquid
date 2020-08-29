@@ -11,15 +11,8 @@
           {% endif %}
             
             <div style="position: relative;">
-              <img src="{{ block.settings.image | img_url: '800x' }}" alt="{{ block.settings.image.alt }}">
-              {% if block.settings.video_url %}
-              <!-- 
-                <div style="position: absolute; z-index: 1; top: 0; left: 0; height: 100%; width: 100%;">
-                <iframe src="https://player.vimeo.com/video/{{ block.settings.video_url.id }}?background=1&autoplay=1&loop=1&byline=0&title=0"
-           frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; object-fit: cover;"></iframe>
-                </div>
-              -->
-              {% endif %}
+              <img src="{{ block.settings.image | img_url: '800x' }}" alt="{{ block.settings.image.alt | escape }}" style="display: block; width: 100%;">
+              {% include 'ambient-video', url: block.settings.video_file_url %}              
             </div>
 
           {% if block.settings.link %}
@@ -76,11 +69,9 @@
             "label": "Image"
           },
           {
-            "id": "video_url",
-            "type": "video_url",
-            "label": "Video URL",
-            "accept": ["vimeo"],
-            "info": "Vimeo only please"
+            "id": "video_file_url",
+            "type": "url",
+            "label": "Video File URL"
           }
         ]
       }
