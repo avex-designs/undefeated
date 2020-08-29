@@ -1,0 +1,87 @@
+<section>
+  {% if section.blocks.size > 0 %}
+    <div class="content-grid content-grid--{{ section.blocks.size }}-col">
+      {% for block in section.blocks %}
+        <div class="content-grid__item {{ block.shopify_attributes }}">
+
+          {% if block.settings.link %}
+            <a href="{{ block.settings.link }}">
+          {% else %}  
+            <span class="non_link">
+          {% endif %}
+            
+            <div style="position: relative;">
+              <img src="{{ block.settings.image | img_url: '800x' }}" alt="{{ block.settings.image.alt | escape }}" style="display: block; width: 100%;">
+              {% include 'ambient-video', url: block.settings.video_file_url %}              
+            </div>
+
+          {% if block.settings.link %}
+            </a>
+          {% else %}
+            </span>
+          {% endif %}
+          
+          <div>
+            {% if block.settings.link %}
+              <a href="{{ block.settings.link }}">
+            {% else %}  
+              <span class="non_link">
+            {% endif %}
+                
+                <h3>{{ block.settings.title }}</h3>
+
+            {% if block.settings.link %}
+              </a>
+            {% else %}
+              </span>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+{% schema %}
+  {
+    "name": "Content Grid",
+    "max_blocks": 4,
+    "blocks": [
+      {
+        "type": "grid_item",
+        "name": "Grid Item",
+        "settings": [
+          {
+            "id": "title",
+            "type": "text",
+            "label": "Title",
+            "default": "Default title",
+            "info": "HTML is accepted"
+          },
+          {
+            "id": "url",
+            "type": "url",
+            "label": "Link to URL"
+          },
+          {
+            "id": "image",
+            "type": "image_picker",
+            "label": "Image"
+          },
+          {
+            "id": "video_file_url",
+            "type": "url",
+            "label": "Video File URL"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Content Grid",
+        "category": "Undefeated",
+        "blocks": []
+      }
+    ]
+  }
+{% endschema %}

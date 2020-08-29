@@ -2,35 +2,36 @@
   <div id="hero_section">
 
     {% for block in section.blocks %}
-    <div class="item {{ block.settings.text_color }}">
-
-      {% if block.settings.link %}
-      <a href="{{ block.settings.link }}" style="background-image:url({{ block.settings.image-picker | img_url: 'master' }})">
-      {% else %}      
-      <div style="background-image:url({{ block.settings.image-picker | img_url: 'master' }})">
-      {% endif %}
-        
-      	<img src="{{ block.settings.image-picker | img_url: 'master' }}" alt="{{ block.settings.image-picker.alt }}">
-        
-      {% if block.settings.link %}
-      </a>
-      {% else %}
-      </div> <!-- hero-wrap -->
-      {% endif %}
-      
-      <div class="hero-text">
-        {% if block.settings.link %}
-        <a href="{{ block.settings.link }}">
-        {% endif %}
-
-        <h2> {{ block.settings.title }} </h2>
+      <div class="item {{ block.settings.text_color }}" {{ block.shopify_attributes }}>
 
         {% if block.settings.link %}
-        </a>
+          <a href="{{ block.settings.link }}" style="background-image:url({{ block.settings.image-picker | img_url: 'master' }})">
+        {% else %}      
+            <div style="background-image:url({{ block.settings.image-picker | img_url: 'master' }})">
         {% endif %}
+          <div style="position: relative">
+        	 <img src="{{ block.settings.image-picker | img_url: 'master' }}" alt="{{ block.settings.image-picker.alt }}">
+            {% render 'ambient-video', url: block.settings.video_file_url %}
+          </div>
+        {% if block.settings.link %}
+          </a>
+        {% else %}
+          </div> <!-- hero-wrap -->
+        {% endif %}
+        
+        <div class="hero-text">
+          {% if block.settings.link %}
+            <a href="{{ block.settings.link }}">
+          {% endif %}
+
+            <h2>{{ block.settings.title }}</h2>
+
+          {% if block.settings.link %}
+            </a>
+          {% endif %}
+        </div>
+
       </div>
-
-    </div>
     {% endfor %}
     
   </div>
@@ -49,43 +50,44 @@
 {% schema %}
   {
     "name": "Hero Slider",
-	"settings": [
-	],
-	"blocks": [
-      {
-        "type": "select",
-        "name": "Add Slide",
-        "settings": [
-          {
-			"id": "description",
-            "type": "text",
-            "label": "Description",
-            "default": "Description Here"
-          },
-		  {
-			"id": "title",
-            "type": "text",
-            "label": "Title",
-            "default": "Default title"
-          },
-		  {
-            "id": "link",
-            "type": "url",
-            "label": "Button link"
-          },
-		  {
-            "id": "image-picker",
-            "type": "image_picker",
-            "label": "Background Image"
-          },
-		  {
-            "id": "image-picker-mobile",
-            "type": "image_picker",
-            "label": "Mobile Background Image"
-          }
-        ]
-      }
-    ],
+  	"settings": [
+  	],
+  	"blocks": [
+        {
+          "type": "select",
+          "name": "Add Slide",
+          "settings": [
+            {
+  			     "id": "description",
+              "type": "text",
+              "label": "Description",
+              "default": "Description Here"
+            },
+  		      {
+  			     "id": "title",
+              "type": "text",
+              "label": "Title",
+              "default": "Default title"
+            },
+  		      {
+              "id": "link",
+              "type": "url",
+              "label": "Button link"
+            },
+  		      {
+              "id": "image-picker",
+              "type": "image_picker",
+              "label": "Background Image"
+            },
+            {
+              "id": "video_file_url",
+              "type": "url",
+              "label": "Background Video File URL",
+              "info": "Optional"
+            }
+          ]
+        }
+      ],
 	"presets": [
 		{
     		"name": "Hero Slideshow",

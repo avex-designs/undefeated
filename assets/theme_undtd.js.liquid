@@ -4530,6 +4530,7 @@ theme.init = function() {
   theme.styleTextLinks();
   theme.searchModal();
   theme.productCardImageLoadingAnimation();
+  theme.ambientVideos();
 
   // Functions to run on load so image sizes can be calculated
   theme.cache.$window.on('load', theme.resizeLogo);
@@ -4824,6 +4825,19 @@ theme.productCardImageLoadingAnimation = function() {
   $(selectors.image + classes.lazyloaded)
     .closest(selectors.imageLink)
     .removeClass(classes.loadingAnimation);
+}
+
+// Wait for ambient videos to start playing and then display them
+theme.ambientVideos = function() {
+  $('video.ambient-video').each(function(i, video) {
+    var $vid = $(video);
+    $vid.one('play', $vid.addClass.bind($vid, 'is-playing'));
+
+    setTimeout(function() {
+      const p = video.play(); // in case autoplay didn't work
+      p && p.catch(function(e) { console.log(e); }); // eslint-disable-line
+    }, 1000);
+  });
 }
 
 $(document).ready(function() {
