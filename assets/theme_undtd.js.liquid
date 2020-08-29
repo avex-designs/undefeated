@@ -3022,7 +3022,7 @@ theme.Product = (function() {
       var onLoadSelect = selectedFilter.toLowerCase();
 
       if ( selectedColor != "-" ) {
-        yanana = $('[data-variant='+onLoadSelect+'] img');   
+        yanana = $('[data-variant="'+onLoadSelect+'"] img');
       }     
     }
 
@@ -3075,7 +3075,7 @@ theme.Product = (function() {
 		    var selectedFilter = selectedColor.replace(' ', '');
 		    var onLoadSelect = selectedFilter.toLowerCase()
 
-		    var yanana = $('[data-variant='+onLoadSelect+'] img')
+		    var yanana = $('[data-variant="'+onLoadSelect+'"] img');
 
 			//var startAt = yanana.index(this);
 
@@ -3306,7 +3306,7 @@ theme.Product = (function() {
 	                        if ( selectedColor == '-' ) {
 								$('.product-single__photo--flex-wrapper').fadeIn('slow');
 	                        } else {
-	                          $('[data-variant='+selectedFilter+']').fadeIn('slow');
+	                          $('[data-variant="'+selectedFilter+'"]').fadeIn('slow');
 	                        }
 	                        console.log('RESIZE 500 - destory settime 500')
 		      			}, 500);
@@ -3445,7 +3445,7 @@ theme.Product = (function() {
 				if ( selectedColor == '-' ) {
 					$('.product-single__photo--flex-wrapper').fadeIn('slow');
 				} else {
-				     $('[data-variant='+selectedFilter+']').fadeIn('slow');
+				     $('[data-variant="'+selectedFilter+'"]').fadeIn('slow');
 				}
 
 				console.log('DESTROY 500 -removeClass .owl-carousel / destory carousel - b')

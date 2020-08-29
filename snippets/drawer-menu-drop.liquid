@@ -14,7 +14,7 @@
                 href="{{ link.url }}"
                 class="mobile-nav__link"
                 id="Label-{{ forloop.index }}"
-                {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>{{ link.title | escape }}</a>
+                {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless %}>{{ link.title | escape }}</a>
               <div class="mobile-nav__toggle">
                 <button type="button" class="mobile-nav__toggle-btn icon-fallback-text" aria-controls="Linklist-{{ forloop.index }}" aria-expanded="false">
                   <span class="icon-fallback-text mobile-nav__toggle-open">
@@ -81,48 +81,45 @@
             </ul>
           </li>
 
-          {% else %}
+        {% else %}
 
           <li class="mobile-nav__item">
             <a
               href="{{ link.url }}"
               class="mobile-nav__link"
-              {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
+              {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless %}>
                 {{ link.title | escape }}
             </a>
           </li>
 
         {% endif %}
       {% endfor %}
+
       {% comment %}
         Spacer element
-      
-      <li class="mobile-nav__spacer"></li>
+        <li class="mobile-nav__spacer"></li>
+      {% endcomment %}
 
       {% comment %}
         If customer accounts are enabled, provide login and create account links
       {% endcomment %}
       {% if shop.customer_accounts_enabled %}
         {% if customer %}
-          <li class="mobile-nav__item mobile-nav__item--secondary">
+          <li class="mobile-nav__item">
             <a href="{{ routes.account_url }}">{{ 'layout.customer.account' | t }}</a>
           </li>
-          <li class="mobile-nav__item mobile-nav__item--secondary">
+          <li class="mobile-nav__item">
             {{ 'layout.customer.log_out' | t | customer_logout_link }}
           </li>
         {% else %}
-          <li class="mobile-nav__item mobile-nav__item--secondary">
+          <li class="mobile-nav__item">
             {{ 'layout.customer.log_in' | t | customer_login_link }}
           </li>
-          <li class="mobile-nav__item mobile-nav__item--secondary">
+          <li class="mobile-nav__item">
             {{ 'layout.customer.create_account' | t | customer_register_link }}
           </li>
         {% endif %}
       {% endif %}
-      {% for link in linklists[section.settings.drawer_bottom_link_list].links %}
-        <li class="mobile-nav__item mobile-nav__item--secondary"><a href="{{ link.url }}">{{ link.title }}</a></li>
-      {% endfor %}
-      {% endcomment %}
     </ul>
     <!-- //mobile-nav -->
   </div>
