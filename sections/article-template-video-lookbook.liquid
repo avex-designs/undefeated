@@ -8,7 +8,7 @@
 
     {% if article.metafields.video.video_embed != blank %}
       <div class="grids video-embed">
-        {{ article.metafields.video.video_embed }}
+        <div>{{ article.metafields.video.video_embed }}</div>
       </div>    
     {% elsif article.image != blank %}
       <div class="grids featured_img">
