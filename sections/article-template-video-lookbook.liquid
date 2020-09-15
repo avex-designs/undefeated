@@ -1,70 +1,56 @@
-<!-- /templates/article.liquid -->
-
-{% assign number_of_comments = article.comments_count %}
-
-{% if comment and comment.created_at %}
-  {% assign number_of_comments = article.comments_count | plus: 1 %}
-{% endif %}
-
 <div class="grids">
   <article class="grid__items article-video" itemscope itemtype="http://schema.org/Article">
-
     <div class="grids">
       <header class="section-header">
         <h1>{{ article.title }}</h1>
       </header>
-
     </div>
 
-    <div class="grids featured_img">
-    {% if article.image %}
+    {% if article.metafields.video.video_embed != blank %}
+      <div class="grids video-embed">
+        {{ article.metafields.video.video_embed }}
+      </div>    
+    {% elsif article.image != blank %}
+      <div class="grids featured_img">
         <img class="lazyload" alt="{{ article.image.alt }}" src="{{ article.image.src | img_url: 'master' }}"/>
+      </div>
     {% endif %}
-    </div>
 
-    <div class="grids">
-          <div class="content" itemprop="articleBody"> {{ article.content }} </div>
-    </div>
-
-    {% if article.metafields.video.video_embed %}
-    <div class="grids video-embed">
-        <div> {{ article.metafields.video.video_embed }} </div>
-    </div>
+    {% if article.content != blank %}
+      <div class="grids">
+        <div class="content" itemprop="articleBody"> {{ article.content }} </div>
+      </div>
     {% endif %}
 
     <div class="grids bot-col-imgs">
-    {% if article.metafields.interview.bot_img_1 %}
+      {% if article.metafields.interview.bot_img_1 %}
         <div class="half init-img"> {{ article.metafields.interview.bot_img_1 | img_tag  }} </div>
-    {% endif %}
-    {% if article.metafields.interview.bot_img_2 %}
+      {% endif %}
+      {% if article.metafields.interview.bot_img_2 %}
         <div class="half"> {{ article.metafields.interview.bot_img_2 | img_tag }}</div>
-    {% endif %}
+      {% endif %}
 
-
-    {% for value in article.metafields.video.image_right %} 
-      <div class="half">
-        <div class="bottom-img">
-        {{ article.metafields.video.image_right[forloop.index0] | img_tag }}
+      {% for value in article.metafields.video.image_right %} 
+        <div class="half">
+          <div class="bottom-img">
+          {{ article.metafields.video.image_right[forloop.index0] | img_tag }}
+          </div>
+          <span class="bottom-img-text">
+          {{ article.metafields.video.sub_text_right [forloop.index0] }}
+          </span>
         </div>
-        <span class="bottom-img-text">
-        {{ article.metafields.video.sub_text_right [forloop.index0] }}
-        </span>
-      </div>
-      <div class="half"> 
-        <div class="bottom-img">
-        {{ article.metafields.video.image_left[forloop.index0] | img_tag }}
+        <div class="half"> 
+          <div class="bottom-img">
+          {{ article.metafields.video.image_left[forloop.index0] | img_tag }}
+          </div>
+          <span class="bottom-img-text">
+          {{ article.metafields.video.sub_text_left [forloop.index0] }}
+          </span>
         </div>
-        <span class="bottom-img-text">
-        {{ article.metafields.video.sub_text_left [forloop.index0] }}
-        </span>
-      </div>
-    {% endfor %} 
-
+      {% endfor %} 
     </div>
-
   </article>
 </div>
-
 
 
 {% schema %}
