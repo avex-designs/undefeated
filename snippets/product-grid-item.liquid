@@ -30,16 +30,24 @@
   {% assign on_sale = true %}
 {% endif %}
 
+{%- assign variant = product.selected_or_first_available_variant -%}
+
+{% comment %} This allows us to pass in a different variant than product.selected_or_first.. {% endcomment %}
+{% if color_variant != false %}
+  {% assign variant = color_variant %}
+{% endif %}
+
 {% assign sold_out = true %}
 {% if product.available %}
   {% assign sold_out = false %}
 {% endif %}
 
-{%- assign variant = product.selected_or_first_available_variant -%}
+{% if color_sold_out %}
+  {% assign sold_out = true %}
+{% endif %}
 
 {% capture img_id_class %}ProductImage-{{ product.featured_image.id }}{% endcapture %}
 {% capture img_wrapper_id %}ProductImageWrapper-{{ product.featured_image.id }}{% endcapture %}
-
 
 {% unless variant.image.src != blank %}
   {%- assign img_url = product.featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -%}
@@ -48,18 +56,16 @@
 {% endunless %}
 
 
-
 <div class="product_wrap {% if sold_out %} is-sold-out{% endif %}" data-product-card>
-  <div class="grid-product__wrapper">
-    
+  <div class="grid-product__wrapper">    
     <div class="grid-product__image-wrapper">
       <a class="grid-product__image-link{% unless product.featured_image.src == blank %} grid-product__image-link--loading{% endunless %}" href="{{ variant.url | within: collection }}" data-image-link>
         {% if product.featured_image.src == blank %}
-        <div id="{{ img_wrapper_id }}" class="product--wrapper">
-            <div style="padding-top:125%;">
-          <img class="grid-product__image product--image" src="{{ product.featured_image.src | img_url: '1024x' }}" alt="{{ product.featured_image.alt | escape }}">
+          <div id="{{ img_wrapper_id }}" class="product--wrapper">
+              <div style="padding-top:125%;">
+            <img class="grid-product__image product--image" src="{{ product.featured_image.src | img_url: '1024x' }}" alt="{{ product.featured_image.alt | escape }}">
+            </div>
           </div>
-        </div>
         {% else %}
           {% comment %} { include 'image-style' with image: product.featured_image, small_style: true, width: width, height: height, wrapper_id: img_wrapper_id, img_id_class: img_id_class } {% endcomment %}
           <div id="{{ img_wrapper_id }}" class="product--wrapper">
@@ -95,28 +101,30 @@
       <span class="grid-product__price-wrap">
 
         <span class="grid-product__price">
-          {% if on_sale %}
-          {% unless sold_out %}
-          <span id="ComparePrice" class="product-single__price--compare-at">
-            {{ variant.compare_at_price | money_without_trailing_zeros }}
-          </span>
-          {% endunless %}
-            <span class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
-          {% else %}
-             <span class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>
-          {% endif %}
-          {% if product.price_varies %}
-            {{ product.price_min | money_without_trailing_zeros }}
-            <span class="icon-fallback-text">
-              <span class="icon icon-plus grid-product__price-min" aria-hidden="true"></span>
-              <span class="fallback-text">+</span>
-            </span>
-            {%- elsif sold_out -%}
+          {% if sold_out %}
             <span class="product-unit-price grid-product__price">
-                <span class="soldout">SOLD<br>OUT</span>
-            </span>
+              <span class="soldout">SOLD<br>OUT</span>
+            </span>          
           {% else %}
-            {{ product.price | money_without_trailing_zeros }}
+            {% if on_sale %}
+              <span class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>            
+              <span id="ComparePrice" class="product-single__price--compare-at">
+                {{ variant.compare_at_price | money_without_trailing_zeros }}
+              </span>
+              <span class="visually-hidden">{{ 'products.general.sale_price' | t }}</span>
+            {% else %}
+              {% comment %} Output this so it displays above product.price below {% endcomment %}
+              <span class="visually-hidden">{{ 'products.general.regular_price' | t }}</span>         
+            {% endif %}          
+            {% if product.price_varies %}
+              {{ product.price_min | money_without_trailing_zeros }}
+              <span class="icon-fallback-text">
+                <span class="icon icon-plus grid-product__price-min" aria-hidden="true"></span>
+                <span class="fallback-text">+</span>
+              </span>
+            {% else %}
+              {{ product.price | money_without_trailing_zeros }}
+            {% endif %}          
           {% endif %}
         </span>
 
