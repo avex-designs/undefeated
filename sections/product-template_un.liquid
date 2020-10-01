@@ -263,7 +263,7 @@
                                         if ( $(window).width() >= 991 ) {
 
                                             var selectedColor = $('select.color-select').val();
-                                            var selectedFilter = selectedColor.replace(' ', '');
+                                            var selectedFilter = selectedColor.replace(/\s/g, ''); // replace ALL blank spaces
                                             var onLoadSelect = selectedFilter.toLowerCase()
                                             $('.product-single__photo--flex-wrapper').hide();
                                             $('[data-variant="'+onLoadSelect+'"]').fadeIn('slow');
@@ -274,7 +274,7 @@
                                           if ( $(window).width() >= 991 ) {
 
                                             var selectedColor = $(this).val().toLowerCase();
-                                            var selectedFilter = selectedColor.replace(' ', '');
+                                            var selectedFilter = selectedColor.replace(/\s/g, '');
                                             $('.product-single__photo--flex-wrapper').hide();
                                             $('[data-variant="'+selectedFilter+'"]').fadeIn('slow');
 
