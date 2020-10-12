@@ -33,7 +33,8 @@
 {%- assign variant = product.selected_or_first_available_variant -%}
 
 {% comment %} This allows us to pass in a different variant than product.selected_or_first.. {% endcomment %}
-{% if color_variant != false %}
+{% comment %} Make sure that color_variant is a real variant otherwise the link will break {% endcomment %}
+{% if color_variant != false or color_variant != blank %}
   {% assign variant = color_variant %}
 {% endif %}
 
