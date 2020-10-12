@@ -35,7 +35,9 @@
 {% comment %} This allows us to pass in a different variant than product.selected_or_first.. {% endcomment %}
 {% comment %} Make sure that color_variant is a real variant otherwise the link will break {% endcomment %}
 {% if color_variant != false or color_variant != blank %}
-  {% assign variant = color_variant %}
+  {% if color_variant.id > 0 %}
+    {% assign variant = color_variant %}
+  {% endif %}
 {% endif %}
 
 {% assign sold_out = true %}
