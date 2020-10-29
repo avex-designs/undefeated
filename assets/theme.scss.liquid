@@ -9517,3 +9517,32 @@ div#mobile-dropwdown {
     transition-delay: 0.5s;
   }
 }
+
+
+// -------------------------
+// Ivy Park Page..
+// -------------------------
+
+.template-page-ivy-park {
+  .main-content {
+    padding-top: 0;
+  }
+
+  #home-hero {
+    margin-bottom: $undftd-wrapper-gutter-desk;
+  }
+
+  .index-sections section + section {
+    margin-top: $undftd-wrapper-gutter-mobile;
+
+    @media screen and (min-width: $undftd-desk ) {
+      margin-top: $undftd-wrapper-gutter-desk;      
+    }
+  }
+
+  @media screen and (max-width: $undftd-sm-desk ) {
+    .content-grid__item + .content-grid__item {
+      margin-top: $undftd-wrapper-gutter-mobile;
+    } 
+  }
+}

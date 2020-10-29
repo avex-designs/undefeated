@@ -1,0 +1,194 @@
+<div>
+  {% comment %}
+    We need to emulate the styling on the homepage
+    And since the original developers styled everything based on IDs
+    we need to duplicate the ids :-/
+  {% endcomment %}
+  <section id="home-hero">
+    <div id="hero_section">
+      <div class="item">
+        <div style="background-image:url({{ section.settings.image-picker | img_url: 'master' }})">
+          <div style="position: relative">
+           <img src="{{ section.settings.image-picker | img_url: 'master' }}" alt="{{ section.settings.image-picker.alt }}">
+            {% render 'ambient-video', url: section.settings.video_file_url %}
+          </div>
+        </div>          
+      </div>
+    </div>
+  </section>
+
+  {% if section.blocks.size > 0 %}
+    <div class="index-sections">
+      {% for block in section.blocks %}
+        <section>
+          {% if block.type == "content_grid" %}
+            {% assign grid_item_count = 0 %}
+            {% capture grid_items %}
+              {% for i in (1..4) %}
+                {% assign image_setting_handle     = 'image_' | append: i %}
+                {% assign video_url_setting_handle = 'video_file_url_' | append: i %}
+
+                {% assign item_image = block.settings[image_setting_handle] %}
+                {% assign item_video = block.settings[video_url_setting_handle] %}
+
+                {% capture grid_item %}
+                  {% if item_image %}
+                    <div class="content-grid__item">
+                      <div style="position: relative;">
+                        <img src="{{ item_image | img_url: '800x' }}" alt="{{ item_image.alt | escape }}" style="display: block; width: 100%;">
+                        {% include 'ambient-video', url: item_video %}              
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endcapture %}
+
+                {% if grid_item != blank %}
+                  {{ grid_item }}
+                  {% assign grid_item_count = grid_item_count | plus: 1 %}
+                {% endif %}
+              {% endfor %}
+            {% endcapture %}
+
+            {% if grid_item_count > 0 %}
+              <div class="content-grid content-grid--{{ grid_item_count }}-col">
+                {{ grid_items }}
+              </div>
+            {% endif %}
+          {% elsif block.type == "collection_grid" %}
+            {% assign collection = collections[block.settings.collection] %}
+            {% assign limit = block.settings.limit | plus: 0 %}
+
+            {% if collection and collection.products.size > 0 %}
+              <div class="content-grid content-grid--4-col">
+                {% for product in collection.products limit: limit %}
+                  <div class="content-grid__item">
+                    {% include 'product-grid-item' %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}          
+          {% endif %}
+        </section>
+      {% endfor %}
+    </div>
+  {% endif %}
+</div>
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#hero_section').slick({
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      arrows: false
+    });
+  });
+</script>
+
+{% schema %}
+  {
+    "name": "Ivy Park",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Hero Image"
+      },
+      {
+        "id": "image-picker",
+        "type": "image_picker",
+        "label": "Image"
+      },
+      {
+        "id": "video_file_url",
+        "type": "url",
+        "label": "Video File URL",
+        "info": "Optional"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "content_grid",
+        "name": "Content Grid",
+        "settings": [
+          {
+            "type": "header",
+            "content": "Grid Item 1"
+          },
+          {
+            "id": "image_1",
+            "type": "image_picker",
+            "label": "Image"
+          },
+          {
+            "id": "video_file_url_1",
+            "type": "url",
+            "label": "Video File URL"
+          },
+          {
+            "type": "header",
+            "content": "Grid Item 2"
+          },
+          {
+            "id": "image_2",
+            "type": "image_picker",
+            "label": "Image"
+          },
+          {
+            "id": "video_file_url_2",
+            "type": "url",
+            "label": "Video File URL"
+          },
+          {
+            "type": "header",
+            "content": "Grid Item 3"
+          },
+          {
+            "id": "image_3",
+            "type": "image_picker",
+            "label": "Image"
+          },
+          {
+            "id": "video_file_url_3",
+            "type": "url",
+            "label": "Video File URL"
+          },
+          {
+            "type": "header",
+            "content": "Grid Item 4"
+          },
+          {
+            "id": "image_4",
+            "type": "image_picker",
+            "label": "Image"
+          },
+          {
+            "id": "video_file_url_4",
+            "type": "url",
+            "label": "Video File URL"
+          }
+        ]
+      },
+      {
+        "type": "collection_grid",
+        "name": "Collection Grid",
+        "settings": [
+          {
+            "id": "collection",
+            "type": "collection",
+            "label": "Collection"
+          },
+          {
+            "id": "limit",
+            "type": "select",
+            "label": "Products To Show",
+            "options": [
+              { "value": "4", "label": "4" },
+              { "value": "8", "label": "8" },
+              { "value": "12", "label": "12" },
+              { "value": "16", "label": "16" }
+            ]
+          }          
+        ]
+      }
+    ]
+  }
+{% endschema %}    
