@@ -78,7 +78,16 @@
 {% comment %}
   Add the page template as a class for easy page or template specific styling.
 {% endcomment %}
-<body id="{{ page_title | handle }}" class="{% if customer %}customer-logged-in {% endif %}template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}">
+
+{% capture body_class %}
+  {% if customer %}customer-logged-in {% endif %}
+  template-{{ template.name | replace: '.', ' ' | truncatewords: 1, '' | handle }}
+  {% if template.suffix != blank %}
+    template-{{ template.name | append: '-' | append: template.suffix | handle }}
+  {% endif %}
+{% endcapture %}
+
+<body id="{{ page_title | handle }}" class="{{ body_class | strip | strip_newlines }}">
 
   {% section 'header_un' %}
 
@@ -114,19 +123,18 @@
       {% section 'slideshow_un' %}
     {% endif %}
     
-
     <main class="main-content" role="main">
-      {% unless template.name == "index" or template == "collection.image" %}
+      {% unless template.name == "index" or template == "collection.image" or template == "page.ivy-park" %}
         <div class="wrapper">
       {% endunless %}
         {{ content_for_layout }}
-      {% unless template.name == "index" or template == "collection.image" %}
+      {% unless template.name == "index" or template == "collection.image" or template == "page.ivy-park" %}
         </div>
       {% endunless %}
     </main>
 
     {% unless template.name == "404" %}
-    {% section 'footer' %}
+      {% section 'footer' %}
     {% endunless %}
 
   </div>
