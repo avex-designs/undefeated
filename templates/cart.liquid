@@ -98,10 +98,13 @@
                 <div class="grid--full cart__row--table{% if item.line_level_discount_allocations != blank %} cart__row--table-with-discount{% endif %}">
 
                   <div class="grid__item one-third text-center">
-
+                    <span>{{ item.quantity }}</span>
+                    {% comment %}
+                    <!-- Hide this for now, the javascript quantity adjuster is messing with it and making it output 0 -->
+                    
                     <label for="updates_{{ item.key }}" class="visually-hidden">{{ 'cart.label.quantity' | t }}</label>
                     <input type="number" name="updates[]" id="updates_{{ item.key }}" class="cart__product-qty" value="{{ item.quantity }}" min="0" data-id="{{ item.key }}">
-
+                    {% endcomment %}
                   </div>
 
                   <div class="grid__item two-thirds text-right">
@@ -201,7 +204,10 @@
               {%- endcapture -%}
 
               <p class="rte"><em>{{ taxes_shipping_checkout }}</em></p>
+              {% comment %}
               <button type="submit" name="update" class="btn--secondary update-cart">{{ 'cart.general.update' | t }}</button>
+              {% endcomment %}
+
               <button type="submit" name="checkout" class="btn cart__checkout">
                 {{ 'cart.general.checkout' | t }} <span class="icon icon-arrow-right" aria-hidden="true"></span>
               </button>
