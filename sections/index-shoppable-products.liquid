@@ -1,0 +1,192 @@
+<section data-section-id="{{ section.id }}" data-section-type="shoppable-products">
+  {% if section.blocks.size > 0 %}
+    <div class="content-grid content-grid--{{ section.blocks.size }}-col">
+      {% for block in section.blocks %}
+        {% if block.settings.product != blank %}
+          {% assign product = all_products[block.settings.product] %}
+          {% assign current_variant = product.selected_or_first_available_variant %}
+
+          <div class="content-grid__item" data-shoppable-product {{ block.shopify_attributes }}>
+            <div>
+              <img src="{{ product.featured_image | img_url: '800x' }}" style="max-width: 100%;" />
+            </div>
+            <div class="">
+              <div class="product-single__meta">
+                <div class="meta-form_wrap" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                  <div class="yada_wrap">
+                    <span class="prod_sku"> SKU: <span class="variant-sku">{{ current_variant.sku }} </span> </span>
+                    <div class="yada">
+                      {% include 'product-price', variant: current_variant %}
+                      <h2 class="product-single__title" itemprop="name">{{ product.title }}</h2>
+                      {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+                        <div class="product-single__policies rte">
+                          {%- if shop.taxes_included -%}
+                            {{ 'products.general.include_taxes' | t }}
+                          {%- endif -%}
+                          {%- if shop.shipping_policy.body != blank -%}
+                            {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form_styles_noise">
+                  {% capture "form_classes" %}
+                    product-single__form{% if product.has_only_default_variant %} product-single__form--no-variants{% endif %}
+                  {%- endcapture %}
+
+                  {% form 'product', product, class: form_classes, data-product-form: 'true' %}
+                    {% if product.available %}
+                      {% unless product.has_only_default_variant %}
+
+                        {% for option in product.options_with_values %}
+
+                          {% comment %}
+                            Only show "sold out" next to the option value if:
+                              - There is a single product option
+                              - There are 2 product options and the first option only has one value
+                          {% endcomment %}
+                          {% assign can_show_sold_out_ui_for_option = false %}
+                          {% if product.options.size == 1 %}
+                            {% assign can_show_sold_out_ui_for_option = true %}
+                          {% elsif product.options.size == 2 and option.position == 2 and product.options_with_values[0].values.size == 1 %}
+                            {% assign can_show_sold_out_ui_for_option = true %}
+                          {% endif %}                          
+
+                          <div class="radio-wrapper js product-form__item">
+                            <label class="single-option-radio__label{% if option.name == 'Default' or option.name == 'Title' %} hidden-label{% endif %}"
+                              for="ProductSelect-option-{{ forloop.index0 }}">
+                              {{ option.name | escape }}
+                            </label>
+
+                            <select class="single-option-selector__radio single-option-selector-{{ section.id }} product-form__input
+                           
+                            {% if option.name == 'Color' or option.name == 'Color' %}
+                              {% for value in option.values limit:1  %}
+                                color-select
+                              {% endfor %}
+                            {% else %}
+                              {% for value in option.values limit:1  %}
+                                size-select
+                              {% endfor %}
+                            {%endif %}"
+                            {% if option.name == 'Color' or option.name == 'Color' %}
+                              {% for value in option.values %}
+                                {% if value == "-" %} style="display:none;" {% endif %}
+                              {% endfor %}
+                            {%endif %}
+                            data-index="option{{ forloop.index }}">
+
+                              {% if option.name == 'Color' or option.name == 'Color' %}
+
+                                {% for value in option.values %}
+                                  <option value="{{ value | escape }}"{% if option.selected_value == value %} selected="selected"{% endif %}>{{ value | escape }}</option>
+                                {% endfor %}
+
+                              {% else %}
+                                {% comment %} By adding this empty + selected option, we're forcing the user to make a selection {% endcomment %}
+                                <option value="" selected="selected">Select {{ option.name }}</option>
+
+                                {% for value in option.values %}
+                                  {% comment %}
+                                    If the product only has one option (like size) then we can show values as sold out by checking the variant for that option
+                                  {% endcomment %}
+                                  {% assign is_disabled = false %}
+                                  {% if can_show_sold_out_ui_for_option %}
+                                    {% for v in product.variants %}
+                                      {% assign variant_option_prop = 'option' | append: option.position %}
+                                      {% if v[variant_option_prop] == value and v.available == false %}
+                                        {% assign is_disabled = true %}
+                                      {% endif %}
+                                    {% endfor %}
+                                  {% endif %}
+
+                                  <option
+                                    value="{{ value | escape }}"
+                                    {% if is_disabled %}
+                                      disabled="disabled"
+                                      aria-disabled="true"
+                                    {% endif %}
+                                  >
+                                    {{ value | escape }}{% if is_disabled %} - SOLD OUT{% endif %}
+                                  </option>                                      
+                                {% endfor %}
+
+                              {% endif %}
+                              </select>
+                          </div> <!-- radio-wrapper product-form__item -->
+                        {% endfor %}
+                      {% endunless %}            
+
+                      <select name="id" class="product-single__variants no-js" data-variant-select>
+                        {% for variant in product.variants %}
+                          {% if variant.available %}
+                            <option {% if variant == product.selected_or_first_available_variant %}
+                              selected="selected" {% endif %}
+                              data-sku="{{ variant.sku }}"
+                              value="{{ variant.id }}">
+                              {{ variant.title }} - {{ variant.price | money_with_currency }}
+                            </option>
+                          {% else %}
+                            <option disabled="disabled">
+                              {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+                            </option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+
+                      <button type="submit" name="add" disabled="disabled" class="disabled btn btn--add-to-cart" {% unless current_variant.available %} disabled="disabled"{% endunless %}>
+                        <span class="btn__text">
+                          Select an<br>option
+                        </span>
+                      </button>
+                    {% else %}
+                      <button type="submit" name="add" disabled="disabled" class="disabled btn btn--add-to-cart sold-out">
+                        <span class="btn__text">
+                          Sold<br /> Out
+                        </span>
+                      </button>  
+                    {% endif %}                          
+                  {% endform %}
+                </div>
+              </div>
+            </div>
+
+            <script type="application/json" data-product-json>
+              {{ product | json }}
+            </script>            
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+{% schema %}
+  {
+    "name": "Shoppable Products",
+    "max_blocks": 2,
+    "blocks": [
+      {
+        "type": "product",
+        "name": "Product",
+        "settings": [
+          {
+            "id": "product",
+            "type": "product",
+            "label": "Product"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Shoppable Products",
+        "category": "Undefeated",
+        "blocks": []
+      }
+    ]
+  }
+{% endschema %}

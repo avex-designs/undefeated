@@ -4469,6 +4469,203 @@ theme.PageAM902020 = (function() {
   return PageAM902020;
 })();
 
+theme.ShoppableProducts = (function() {
+
+  var selectors = {
+    productJSON: '[data-product-json]',
+    // productImageWrapper: '.product-single__photo-wrapper',
+    // productImages: '.product-single__photos',
+    // productImagePhoto: '.product-single__photo',
+    // productImagePhotoFlexWrapper: '.product-single__photo--flex-wrapper',
+    // productThumbnail: '.product-single__thumbnail',
+    // productImagePhotoContainer: '.product-single__photo--container',
+    // productFullDetails: '.product-single__full-details',
+    // productForm: '.add-to-cart__form',
+    addToCart: '.btn--add-to-cart',
+    addToCartText: '.btn__text',
+    priceContainer: '[data-price-container]',
+    productPrice: '#ProductPrice',
+    SKU: '.variant-sku',
+    priceA11y: '#PriceA11y',
+    comparePrice: '#ComparePrice',
+    comparePriceA11y: '#ComparePriceA11y',
+    comparePriceWrapper: '.product-single__price--wrapper',
+    // quantityElements: '.js-quantity-selector, label + .js-qty',
+    originalSelectorId: '[data-variant-select]',
+    singleOptionSelector: '.single-option-selector__radio',
+    // radioWrapper: '.radio-wrapper',
+    // meta: '.product-single__meta',
+    // productWrapper: '.product-single',
+    // shopifyPaymentButton: '.shopify-payment-button',
+    unitPrice: '[data-unit-price]',
+    unitPriceBaseUnit: '[data-unit-price-base-unit]'
+  };
+
+  var classes = {
+    priceContainerUnitAvailable: 'price-container--unit-available'
+  };  
+
+  function ShoppableProduct(el) {
+    this.$el = $(el);
+    this.name = 'ShoppableProduct';
+
+    this.product = JSON.parse($(selectors.productJSON, this.$el).html());
+
+    var variantOptions = {
+      $container: this.$el,
+      enabledHistoryState: false,
+      singleOptionSelector: selectors.singleOptionSelector,
+      originalSelectorId: selectors.originalSelectorId,
+      product: this.product
+    };
+
+    this.variants = new slate.Variants(variantOptions);
+
+    this.$addToCart = $(selectors.addToCart, this.$el);
+    this.$addToCartText = $(selectors.addToCartText, this.$el);
+    this.$priceContainer = $(selectors.priceContainer, this.$el);
+    this.$productPrice = $(selectors.productPrice, this.$el);
+    this.$priceA11y = $(selectors.priceA11y, this.$el);
+    // $(this.selectors.quantityElements, this.$container)
+    // $(this.selectors.shopifyPaymentButton, this.$container)    
+    this.$comparePrice = $(selectors.comparePrice, this.$el);
+    this.$comparePriceWrapper = $(selectors.comparePriceWrapper, this.$el);
+    this.$comparePriceA11y = $(selectors.comparePriceA11y, this.$el);
+    this.$unitPrice = $(selectors.unitPrice, this.$el);
+    this.$unitPriceBaseUnit = $(selectors.unitPriceBaseUnit, this.$el);
+    this.$sku = $(selectors.SKU, this.$el);
+
+    // Override defaults in theme.strings with potential template overrides
+    theme.productStrings = theme.productStrings || {};
+    $.extend(theme.strings, theme.productStrings); 
+
+    this.$el.on('variantChange', this.onVariantChange.bind(this));
+  }
+
+  ShoppableProduct.prototype = _.assignIn({}, ShoppableProduct.prototype, {
+    onVariantChange: function(evt) {
+      var moneyFormat = theme.strings.moneyFormat;
+      var variant = evt.variant;
+      var translations = theme.strings;
+
+      if (variant) {
+
+        this.$priceContainer.removeClass('visibility-hidden ' + classes.priceContainerUnitAvailable);
+        this.$productPrice.attr('aria-hidden', 'false');
+
+        // $(this.selectors.priceA11y, this.$container).attr(
+        //   'aria-hidden',
+        //   'false'
+        // );
+
+        // Select a valid variant if available
+        if (variant.available) {
+          // Available, enable the submit button, change text, show quantity elements
+          this.$addToCart
+            .removeClass('disabled')
+            .prop('disabled', false);
+          this.$addToCartText.html(translations.addToCart);
+          // $(this.selectors.quantityElements, this.$container).show();
+          // $(this.selectors.shopifyPaymentButton, this.$container).show();
+
+          // Update the full details link
+          // var $link = $(this.selectors.productFullDetails, this.$container);
+          // if ($link.length) {
+          //   $link.attr(
+          //     'href',
+          //     this.updateUrlParameter($link.attr('href'), 'variant', variant.id)
+          //   );
+          // }
+        } else {
+          // Sold out, disable the submit button, change text, hide quantity elements
+          this.$addToCart
+            .addClass('disabled')
+            .prop('disabled', true);
+          this.$addToCartText.html(translations.soldOut);
+          // $(this.selectors.quantityElements, this.$container).hide();
+          // $(this.selectors.shopifyPaymentButton, this.$container).hide();
+        }
+
+        this.$productPrice
+          .html(theme.Currency.formatMoney(variant.price, moneyFormat))
+          .show();
+
+        // Also update and show the product's compare price if necessary
+        if (variant.compare_at_price > variant.price) {
+          this.$comparePrice.html(
+            theme.Currency.formatMoney(variant.compare_at_price, moneyFormat)
+          );
+          this.$comparePriceWrapper.removeClass('hide');
+          this.$productPrice.addClass('on-sale');
+          this.$comparePriceWrapper.attr('aria-hidden', 'false');
+          this.$comparePriceA11y.attr('aria-hidden', 'false');
+        } else {
+          this.$comparePriceWrapper
+            .addClass('hide')
+            .attr('aria-hidden', 'true');
+          this.$productPrice
+            .removeClass('on-sale');
+          this.$comparePriceA11y.attr('aria-hidden','true');
+        }
+
+        if (variant.unit_price) {
+          this.$unitPrice.html(theme.Currency.formatMoney(variant.unit_price, moneyFormat));
+          this.$unitPriceBaseUnit.html(this.getBaseUnit(variant));
+          this.$priceContainer.addClass(classes.priceContainerUnitAvailable);
+        }
+
+        // Also Show SKU
+        this.$sku.html(variant.sku);
+      } else {
+        // The variant doesn't exist, disable submit button.
+        // This may be an error or notice that a specific variant is not available.
+        // To only show available variants, implement linked product options:
+        //   - http://docs.shopify.com/manual/configuration/store-customization/advanced-navigation/linked-product-options
+        this.$addToCart
+          .addClass('disabled')
+          .prop('disabled', true);
+        this.$addToCartText.html(translations.unavailable);
+        // $(this.selectors.quantityElements, this.$container).hide();
+        // $(this.selectors.shopifyPaymentButton, this.$container).hide();
+
+        this.$priceContainer.addClass('visibility-hidden');
+        this.$productPrice.attr('aria-hidden', 'true');
+        this.$priceA11y.attr('aria-hidden', 'true');
+        this.$comparePriceWrapper.attr('aria-hidden', 'true');
+        this.$comparePriceA11y.attr('aria-hidden', 'true');
+      }      
+    },
+    getBaseUnit: function(variant) {
+      return variant.unit_price_measurement.reference_value === 1
+        ? variant.unit_price_measurement.reference_unit
+        : variant.unit_price_measurement.reference_value +
+            variant.unit_price_measurement.reference_unit;
+    }
+  });
+
+
+
+  function ShoppableProductsSection(container) {
+    this.$container = $(container);
+
+    this.shoppableProducts = $.map($('[data-shoppable-product]', this.$container), function(el) { return new ShoppableProduct(el); });
+
+    if (theme.settings.cartType === 'drawer') {
+      ajaxCart.init({
+        addToCartSelector: 'button[type="submit"]',
+        enableQtySelectors: true,
+        moneyFormat: theme.strings.moneyFormat
+      });
+    }
+  }
+
+  // ShoppableProducts.prototype = _.assignIn({}, ShoppableProducts.prototype, {
+
+  // });
+
+  return ShoppableProductsSection;
+})();
+
 
 theme.variables = {
   productPageLoad     : false,
@@ -4848,6 +5045,7 @@ $(document).ready(function() {
   sections.register('collection-template', theme.Collection);
   sections.register('header-section', theme.HeaderSection);
   sections.register('featured-content-section', theme.FeaturedContentSection);
+  sections.register('shoppable-products', theme.ShoppableProducts);
   sections.register('newsletter-section', theme.NewsletterSection);
   sections.register('slideshow-section', theme.SlideshowSection);
   sections.register('password-header', theme.PasswordHeader);

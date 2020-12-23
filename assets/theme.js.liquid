@@ -3419,6 +3419,44 @@ theme.Search = (function() {
   return Search;
 })();
 
+theme.ShoppableProducts = (function() {
+
+  function ShoppableProduct(el) {
+    this.$el = $(el);
+    this.name = 'ShoppableProduct';
+  }
+
+
+
+
+
+
+
+
+
+
+  function ShoppableProductsSection(container) {
+    this.$container = $(container);
+
+    this.shoppableProducts = $.map($('[data-shoppable-product]', this.$container), function(el) { return new ShoppableProduct(el); });
+
+    console.log(this.shoppableProducts)
+
+    if (theme.settings.cartType === 'drawer') {
+      ajaxCart.init({
+        enableQtySelectors: true,
+        moneyFormat: theme.strings.moneyFormat
+      });
+    }
+  }
+
+  // ShoppableProducts.prototype = _.assignIn({}, ShoppableProducts.prototype, {
+
+  // });
+
+  return ShoppableProductsSection;
+})();
+
 
 theme.variables = {
   productPageLoad     : false,
@@ -3790,6 +3828,7 @@ $(document).ready(function() {
   sections.register('product-recommendations', theme.ProductRecommendations);
   sections.register('map', theme.Maps);
   sections.register('search', theme.Search);
+  sections.register('shoppable-products', theme.ShoppableProducts);
 });
 
 /*
