@@ -3482,6 +3482,10 @@ button.mfp-arrow {
     //padding-bottom: 55px;
   }
 
+  .shoppable-product & {
+    margin: 0;
+  }
+
   .slick-dots {
     //background-color: $colorProductBackground;
     bottom: 0;
@@ -6444,11 +6448,15 @@ PRODUCT PAGE NOISE
     //display: flex;
     //flex-wrap: wrap;
   
-    >* {
+    > * {
     	//flex: 0 0 auto;
     	width: 50%;
       
-        @include un_mb { width: 100%; }
+      @include un_mb { width: 100%; }
+
+      .shoppable-product & {
+          width: 100%;
+      }
     }
 }
 
@@ -6461,10 +6469,10 @@ PRODUCT PAGE NOISE
     padding: 1.25rem;
     margin-right: -1.25rem;
   
-    >* {
+    > * {
       width: 100%;
       
-        @include un_mb { width: 100%; }
+      @include un_mb { width: 100%; }
     }
 }
 
@@ -6529,6 +6537,16 @@ PRODUCT PAGE NOISE
         padding: 20px;
         padding: 1.25rem;
         float:left;
+    }
+
+    .shoppable-product & {
+      margin: 0;
+      width: 100%;
+
+      .product-single__photo--flex-wrapper {
+        float: none;
+        padding: 0;
+      }
     }
 }
 

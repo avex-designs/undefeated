@@ -784,7 +784,6 @@ var ajaxCart = (function(module, $) {
     $cartCountSelector,
     $cartCostSelector,
     $cartContainer,
-
     $cartContainer_Drawer,
     $cartContainer_ATC;
 
@@ -800,13 +799,10 @@ var ajaxCart = (function(module, $) {
     adjustCartCallback,
     qtySelectors,
     validateQty,
-
-	cartUpdateCallbackZOR,
-
-	cartUpdateCallbackZORdrawer,
-	buildCartdrawer,
-
-	cartCallback_ATC,
+	  cartUpdateCallbackZOR,
+	  cartUpdateCallbackZORdrawer,
+	  buildCartdrawer,
+	  cartCallback_ATC,
     buildCart_ATC,
     cartUpdateCallback_ATC;
 
@@ -895,6 +891,7 @@ var ajaxCart = (function(module, $) {
     $formContainer.on('submit', function(evt) {
       evt.preventDefault();
 
+      var $form = $(evt.currentTarget); // This plugin is fucked, need to pass the actual form to the callbacks because $formContainer gets overwritten when we initialize the plugin multiple times
       // Add class to be styled if desired
       $addToCart.removeClass('is-added').addClass('is-adding');
 
@@ -903,28 +900,30 @@ var ajaxCart = (function(module, $) {
 
       ShopifyAPI.addItemFromForm(
         evt.target,
-        itemAddedCallback,
-        itemErrorCallback
+        function() {
+          itemAddedCallback($form);
+        },
+        function(XMLHttpRequest) {
+          itemErrorCallback($form, XMLHttpRequest);
+        }
       );
     });
   };
 
-  itemAddedCallback = function() {
+  itemAddedCallback = function($form) {
     $addToCart.removeClass('is-adding').addClass('is-added');
 
     ShopifyAPI.getCart(cartUpdateCallback);
-
     //console.log('added to cart');
-
   };
 
-  itemErrorCallback = function(XMLHttpRequest) {
+  itemErrorCallback = function($form, XMLHttpRequest) {
     var data = eval('(' + XMLHttpRequest.responseText + ')');
     $addToCart.removeClass('is-adding is-added');
 
     if (data.message) {
       if (data.status === 422) {
-        $formContainer.after(
+        $form.after(
           //'<div class="errors qty-error">' + data.description + '</div>'
           '<div class="errors qty-error">This item is already in your cart</div>'
         );
@@ -939,9 +938,7 @@ var ajaxCart = (function(module, $) {
 
   cartUpdateCallback = function(cart) {
     // Update quantity and price
-
-    console.log('added to cart');
-
+    // console.log('added to cart');
     scrollToTop()
 
     //buildCart(cart);
@@ -956,7 +953,6 @@ var ajaxCart = (function(module, $) {
     } else if ( bana == 0 ) {
     	$('.cart-link').removeClass('bold');
     }
-
   };
 
   cartUpdateCallbackZOR = function(cart) {
@@ -1459,12 +1455,9 @@ var ajaxCart = (function(module, $) {
     cartCallback(cart);
     
     setTimeout(function() {
-        $cartContainer_ATC.empty();
+      $cartContainer_ATC.empty();
     }, 2250);
-	
   };
-
-
 
 
   adjustCart = function() {
@@ -4474,9 +4467,9 @@ theme.ShoppableProducts = (function() {
   var selectors = {
     productJSON: '[data-product-json]',
     // productImageWrapper: '.product-single__photo-wrapper',
-    // productImages: '.product-single__photos',
-    // productImagePhoto: '.product-single__photo',
-    // productImagePhotoFlexWrapper: '.product-single__photo--flex-wrapper',
+    productImages: '.product-single__photos',
+    productImagePhoto: '.product-single__photo',
+    productImagePhotoFlexWrapper: '.product-single__photo--flex-wrapper',
     // productThumbnail: '.product-single__thumbnail',
     // productImagePhotoContainer: '.product-single__photo--container',
     // productFullDetails: '.product-single__full-details',
@@ -4497,12 +4490,14 @@ theme.ShoppableProducts = (function() {
     // meta: '.product-single__meta',
     // productWrapper: '.product-single',
     // shopifyPaymentButton: '.shopify-payment-button',
+    colorSelect: 'select.color-select',
     unitPrice: '[data-unit-price]',
     unitPriceBaseUnit: '[data-unit-price-base-unit]'
   };
 
   var classes = {
-    priceContainerUnitAvailable: 'price-container--unit-available'
+    priceContainerUnitAvailable: 'price-container--unit-available',
+    owlCarousel: 'owl-carousel owl-theme'
   };  
 
   function ShoppableProduct(el) {
@@ -4510,6 +4505,7 @@ theme.ShoppableProducts = (function() {
     this.name = 'ShoppableProduct';
 
     this.product = JSON.parse($(selectors.productJSON, this.$el).html());
+    this.carousel = null;
 
     var variantOptions = {
       $container: this.$el,
@@ -4534,12 +4530,29 @@ theme.ShoppableProducts = (function() {
     this.$unitPrice = $(selectors.unitPrice, this.$el);
     this.$unitPriceBaseUnit = $(selectors.unitPriceBaseUnit, this.$el);
     this.$sku = $(selectors.SKU, this.$el);
+    this.$colorSelect = $(selectors.colorSelect, this.$el);
+    this.$productImages = $(selectors.productImages, this.$el);
+    this.$productFlexWrapper = $(selectors.productImagePhotoFlexWrapper, this.$el);
 
     // Override defaults in theme.strings with potential template overrides
     theme.productStrings = theme.productStrings || {};
     $.extend(theme.strings, theme.productStrings); 
 
+    this.createImageCarousel();
+    this.createZoom();
+
     this.$el.on('variantChange', this.onVariantChange.bind(this));
+    this.$colorSelect.on('change', this.filterCarousel.bind(this));
+
+    if (theme.settings.cartType === 'drawer') {
+      ajaxCart.init({
+        formSelector: this.$el.find('form'),
+        cartContainer: '#CartContainer',
+        addToCartSelector: 'button[type="submit"]',
+        enableQtySelectors: true,
+        moneyFormat: theme.strings.moneyFormat
+      });
+    }    
   }
 
   ShoppableProduct.prototype = _.assignIn({}, ShoppableProduct.prototype, {
@@ -4640,28 +4653,62 @@ theme.ShoppableProducts = (function() {
         ? variant.unit_price_measurement.reference_unit
         : variant.unit_price_measurement.reference_value +
             variant.unit_price_measurement.reference_unit;
+    },
+    createImageCarousel: function() {
+      this.$productImages.addClass(classes.owlCarousel);
+
+      this.carousel = this.$productImages.owlCarousel({
+        loop: true,
+        margin: 0,
+        nav: false,
+        dots: true,
+        items: 1
+      });
+
+      this.filterCarousel();
+    },
+    filterCarousel: function() {
+      if (this.carousel === null) return;
+
+      if (this.$colorSelect.val() != '-') {
+        var selectedColor = this.$colorSelect.val().toLowerCase().replace(' ', '');
+        var key = '.' + selectedColor;
+
+        this.carousel.owlcarousel2_filter(key);
+      }
+    },
+    createZoom: function() {
+      this.$productImages.magnificPopup({
+        delegate: selectors.productImagePhoto,
+        type: 'image',
+        midClick: true,
+        mainClass: 'mfp-fade',
+        closeOnBgClick: true,
+        closeBtnInside: false,
+        closeMarkup: '<button title="Close (Esc)" type="button" class="mfp-close"> <img src="https://cdn.shopify.com/s/files/1/2206/5449/files/close-modal.svg?5305"/> </button>',
+        closeOnContentClick: true,
+        tClose: theme.strings.zoomClose,
+        removalDelay: 500,
+        disableOn: function() {
+          return $(window).width() >= 992;
+        },
+        gallery: {
+          enabled: true,
+          navigateByImgClick: false,
+          arrowMarkup:
+            '<button title="%title%" type="button" class="mfp-arrow mfp-arrow-%dir%"><span class="mfp-chevron mfp-chevron-%dir%"></span></button>',
+          tPrev: theme.strings.zoomPrev,
+          tNext: theme.strings.zoomNext
+        }
+      });
     }
   });
-
-
 
   function ShoppableProductsSection(container) {
     this.$container = $(container);
 
     this.shoppableProducts = $.map($('[data-shoppable-product]', this.$container), function(el) { return new ShoppableProduct(el); });
-
-    if (theme.settings.cartType === 'drawer') {
-      ajaxCart.init({
-        addToCartSelector: 'button[type="submit"]',
-        enableQtySelectors: true,
-        moneyFormat: theme.strings.moneyFormat
-      });
-    }
   }
-
-  // ShoppableProducts.prototype = _.assignIn({}, ShoppableProducts.prototype, {
-
-  // });
 
   return ShoppableProductsSection;
 })();
