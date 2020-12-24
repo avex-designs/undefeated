@@ -1,0 +1,396 @@
+<div itemscope itemtype="http://schema.org/Product" id="ProductSection--{{ section.id }}" data-section-id="{{ section.id }}" data-section-type="launch-product" data-image-zoom-type="true" data-enable-history-state="false" data-scroll-to-image="true">
+  {% if section.settings.product != blank %}
+    {% assign product = all_products[section.settings.product] %}
+    {% assign current_variant = product.selected_or_first_available_variant %}
+
+    {% comment %}
+    <meta itemprop="image" content="{{ product.featured_image.src | img_url: 'grande' }}">
+    {% assign current_variant = product.selected_or_first_available_variant %}
+    {% assign featured_image = current_variant.featured_image | default: product.featured_image %}
+    {% endcomment %}
+
+    <div class="grids product-singles" style="display: inline-block; width: 100%; margin-top: 0;">
+      <div class="grid__items">
+        <div class="product-single__photoszor">
+          {% capture img_id_class %}product-single__photo-{{ featured_image.id }}{% endcapture %}
+          {% capture wrapper_id %}ProductImageWrapper-{{ featured_image.id }}{% endcapture %}
+        
+          <div class="grid__item product-single__meta--wrapper">
+
+            <div class="product-meta_height">
+
+              <div class="product-single__meta">
+                
+                <div class="product-single__extra-notes mob-hide">
+                  <div class="prod_details_noise wrappy"> 
+                    <div class="deets_wrap">
+                      <div class="details">
+                        <div class="prod_details_lunks">
+                          <span style="text-decoration: underline;">Product details</span>
+                        </div>
+                        <div class="details-content">
+                          <span class="tab-container" id="tab1C">
+                            {{ product.description }}
+                          </span>
+                        </div>
+                      </div> <!-- details -->
+                    </div><!-- deets - wrap -->
+                  </div> <!-- prod details noise -->
+                </div> <!-- mob hide -->
+
+                <div class="meta-form_wrap" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+
+                  <div class="yada_wrap">
+                    <span class="prod_sku"> SKU: <span id="sku_change" class="variant-sku">{{ current_variant.sku }} </span> </span>
+                    <div class="yada">
+                      {% include 'product-price', variant: current_variant %}
+                      <h1 class="product-single__title" itemprop="name">{{ product.title }}</h1>
+                      {%- if shop.taxes_included or shop.shipping_policy.body != blank -%}
+                        <div class="product-single__policies rte">
+                          {%- if shop.taxes_included -%}
+                            {{ 'products.general.include_taxes' | t }}
+                          {%- endif -%}
+                          {%- if shop.shipping_policy.body != blank -%}
+                            {{ 'products.general.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+                      <meta itemprop="priceCurrency" content="{{ shop.currency }}">
+                      <link itemprop="availability" href="http://schema.org/{% if product.available %}InStock{% else %}OutOfStock{% endif %}">
+                    </div>
+                  </div>
+                  
+                  <div class="desk-hide wrappyzor">
+                    <div class="prod_details_noise wrappy"> 
+                      <div class="deets_wrap">
+                        <div class="details">
+                          <div id="tabs" class="prod_details_lunks">
+                            <span> <a id="tab1" class="deets_link mob_deets">Product details</a> </span>
+                            <span> <a id="tab2" class="size_chart mob_size_chart" href="#size-chart"> View size chart </a> </span>
+                          </div>
+                          <div class="details-content">
+                            <span class="tab-container mob_pdp_desc" id="tab1C">
+                              {{ product.description }}
+                            </span>
+                            <span class="tab-container mob_pdp_size_chart" style="display:none;" id="tab2C">
+                              {{ product.metafields.product.size_chart }}
+                            </span>
+                          </div>
+                        </div> <!-- details -->
+
+                        <div class="notes">
+                          {{ product.metafields.product.product__model_details }}
+                        </div><!-- notes -->
+                      </div><!-- deets - wrap -->
+                    </div> <!-- prod details noise -->
+                  </div> <!-- desk-hide -->
+
+                  <div class="form_styles_noise">
+                  {% capture "form_classes" %}
+                    product-single__form{% if product.has_only_default_variant %} product-single__form--no-variants{% endif %}
+                  {%- endcapture %}
+                  {% capture "form_id" %}AddToCartForm--{{ section.id }}{%- endcapture %}
+                  {% form 'product', product, class:form_classes, id:form_id, data-product-form: '' %}
+
+                    {% if product.available %}
+                      {% unless product.has_only_default_variant %}
+
+                        {% for option in product.options_with_values %}
+
+                          {% comment %}
+                            Only show "sold out" next to the option value if:
+                              - There is a single product option
+                              - There are 2 product options and the first option only has one value
+                          {% endcomment %}
+                          {% assign can_show_sold_out_ui_for_option = false %}
+                          {% if product.options.size == 1 %}
+                            {% assign can_show_sold_out_ui_for_option = true %}
+                          {% elsif product.options.size == 2 and option.position == 2 and product.options_with_values[0].values.size == 1 %}
+                            {% assign can_show_sold_out_ui_for_option = true %}
+                          {% endif %}                          
+
+                          <div class="radio-wrapper js product-form__item">
+                            <label class="single-option-radio__label{% if option.name == 'Default' or option.name == 'Title' %} hidden-label{% endif %}"
+                              for="ProductSelect-option-{{ forloop.index0 }}">
+                              {{ option.name | escape }}
+                            </label>
+
+                            {% if section.settings.product_selector == 'radio' %}
+
+                                <fieldset class="single-option-radio"
+                                  name="{{ option.name | handleize }}"
+                                  id="ProductSelect-option-{{ forloop.index0 }}">
+                                  {% assign option_index = forloop.index %}
+                                  {% for value in option.values %}
+                                    {% assign variant_label_state = true %}
+                                    {% if product.options.size == 1 %}
+                                      {% unless product.variants[forloop.index0].available  %}
+                                        {% assign variant_label_state = false %}
+                                      {% endunless %}
+                                    {% endif %}
+                                    <input type="radio"
+                                      {% if option.selected_value == value %} checked="checked"{% endif %}
+                                      {% unless variant_label_state %} disabled="disabled"{% endunless %}
+                                      value="{{ value | escape }}"
+                                      data-index="option{{ option_index }}"
+                                      name="{{ option.name | handleize }}"
+                                      class="single-option-selector__radio{% unless variant_label_state %} disabled{% endunless %}"
+                                      id="ProductSelect-option-{{ option.name | handleize }}-{{ value | escape }}">
+                                    <label for="ProductSelect-option-{{ option.name | handleize }}-{{ value | escape }}"{% unless variant_label_state %} class="disabled"{% endunless %}>{{ value | escape }}</label>
+                                  {% endfor %}
+                                </fieldset>
+
+                            {% else %}
+
+                                <select class="single-option-selector__radio single-option-selector-{{ section.id }} product-form__input
+                               
+                                {% if option.name == 'Color' or option.name == 'Color' %}
+                                  {% for value in option.values limit:1  %}
+                                    color-select
+                                  {% endfor %}
+                                {% else %}
+                                  {% for value in option.values limit:1  %}
+                                    size-select
+                                  {% endfor %}
+                                {%endif %}"
+                                {% if option.name == 'Color' or option.name == 'Color' %}
+                                  {% for value in option.values %}
+                                    {% if value == "-" %} style="display:none;" {% endif %}
+                                  {% endfor %}
+                                {%endif %}
+                                id="SingleOptionSelector-{{ forloop.index0 }}" data-index="option{{ forloop.index }}">
+
+                                {% if option.name == 'Color' or option.name == 'Color' %}
+
+                                  {% for value in option.values %}
+                                    <option value="{{ value | escape }}"{% if option.selected_value == value %} selected="selected"{% endif %}>{{ value | escape }}</option>
+                                  {% endfor %}
+
+                                {% else %}
+                                  {% comment %} By adding this empty + selected option, we're forcing the user to make a selection {% endcomment %}
+                                  <option value="" selected="selected">Select {{ option.name }}</option>
+
+                                  {% for value in option.values %}
+                                    {% comment %}
+                                      If the product only has one option (like size) then we can show values as sold out by checking the variant for that option
+                                    {% endcomment %}
+                                    {% assign is_disabled = false %}
+                                    {% if can_show_sold_out_ui_for_option %}
+                                      {% for v in product.variants %}
+                                        {% assign variant_option_prop = 'option' | append: option.position %}
+                                        {% if v[variant_option_prop] == value and v.available == false %}
+                                          {% assign is_disabled = true %}
+                                        {% endif %}
+                                      {% endfor %}
+                                    {% endif %}
+
+                                    <option
+                                      value="{{ value | escape }}"
+                                      {% if is_disabled %}
+                                        disabled="disabled"
+                                        aria-disabled="true"
+                                      {% endif %}
+                                    >
+                                      {{ value | escape }}{% if is_disabled %} - SOLD OUT{% endif %}
+                                    </option>                                      
+                                  {% endfor %}
+
+                                {% endif %}
+
+                                </select>
+
+                            {% endif %}
+
+                          </div> <!-- radio-wrapper product-form__item -->
+
+                          {% if option.name == 'Color' or option.name == 'Color' %}
+                              {% for value in option.values limit:1 %}
+                                {% unless value == "-" %}
+                                  <style>
+                                   /* .product-single__photo--flex-wrapper { display:none; } */
+                                  </style>
+                                    <script type="text/javascript">
+                                    $(document).ready(function() {
+                                      /* Page Load Color Variant Image Filter */
+                                      if ( $(window).width() >= 991 ) {
+
+                                          // var selectedColor = $('select.color-select').val();
+                                          // var selectedFilter = selectedColor.replace(/\s/g, ''); // replace ALL blank spaces
+                                          // var onLoadSelect = selectedFilter.toLowerCase()
+                                          // $('.product-single__photo--flex-wrapper').hide();
+                                          // $('[data-variant="'+onLoadSelect+'"]').fadeIn('slow');
+
+                                          // console.log('page load - filter colors images / above 991 - PDP');
+                                      }
+                                    });
+                                    </script>
+                                  {% endunless %}
+                              {% endfor %}
+                          {% endif %}
+
+                        {% endfor %}
+
+                      {% endunless %}
+
+                      <select name="id" id="ProductSelect" class="product-single__variants no-js" data-variant-select>
+                        {% for variant in product.variants %}
+                          {% if variant.available %}
+                            <option {% if variant == product.selected_or_first_available_variant %}
+                              selected="selected" {% endif %}
+                              data-sku="{{ variant.sku }}"
+                              value="{{ variant.id }}">
+                              {{ variant.title }} - {{ variant.price | money_with_currency }}
+                            </option>
+                          {% else %}
+                            <option disabled="disabled">
+                              {{ variant.title }} - {{ 'products.product.sold_out' | t }}
+                            </option>
+                          {% endif %}
+                        {% endfor %}
+                      </select>
+
+                      {%- capture atc_class -%}
+                        product-single__add-to-cart
+                        product-single__add-to-cart--full-width
+                      {%- endcapture -%}
+                      {% assign atc_id = "AddToCart--" | append: section.id %}
+
+                      <div class="{{ atc_class }}">
+                        <button type="submit" name="add" href="#CartDrawer_ATC" id="{{ atc_id }}" disabled="disabled" class="disabled btn btn--add-to-cart{% if section.settings.enable_payment_button %} btn--secondary-accent{% endif %}"{% unless current_variant.available %} disabled="disabled"{% endunless %}>
+                          <span class="btn__text">
+                            Select an<br>option
+                          </span>
+                        </button>
+                      </div>
+                    {% else %}
+                      <div class="{{ atc_class }}">
+                        <button type="submit" name="add" id="{{ atc_id }}" disabled="disabled" class="disabled btn btn--add-to-cart sold-out">
+                          <span class="btn__text">
+                            Sold<br /> Out
+                          </span>
+                        </button>
+                      </div>
+                    {% endif %}                      
+                  {% endform %}
+                  </div>
+
+                </div> <!-- itemprop 'offers' -->
+                {% comment %} <div class="product-single__description rte" itemprop="description">  {{ product.description }} </div> {% endcomment %}
+              </div> <!-- product-single_meta -->
+
+            </div> <!-- product-meta_height -->
+
+          </div> <!-- product-single__meta--wrapper -->
+
+         </div> <!-- product-single__photoszor / featured img + product meta -->
+      
+         <div class="product-single__photos">
+          {% assign count = 0 %}
+          {% for image in product.images %}
+            {% assign count = count | plus: 1 %}
+            {% capture img_id_class %}product-single__photo-{{ image.id }}{% endcapture %}
+            {% capture wrapper_id %}ProductImageWrapper-{{ image.id }}{% endcapture %}
+            <div class="product-single__photo--flex-wrapper all {{ image.alt | escape | downcase | remove: ' ' }}" data-variant="{{ image.alt | escape | downcase  | remove: ' ' }}">
+              <div class="product-single__photo--flex">
+                {% comment %} { include 'image-style' with image: featured_image, width: 575, height: 850, small_style: true, wrapper_id: wrapper_id, img_id_class: img_id_class } {% endcomment %}
+                <div id="{{ wrapper_id }}" class="product-single__photo--container">
+                  <div class="product-single__photo-wrapper" style="padding-top:125%;">
+                    {% assign img_url = image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
+                    <img class="product-single__photo lazyload {{ img_id_class }}"
+                      src="{{ image | img_url: '300x' }}"
+                      data-src="{{ img_url }}"
+                      data-widths="[180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 2048]"
+                      data-aspectratio="{{ image.aspect_ratio }}"
+                      data-sizes="auto"
+                      data-id="{{ count }}"
+                      data-mfp-src="{{ image.src | img_url: '1024x1024' }}"
+                      data-image-id="{{ image.id }}"
+                      alt="{{ image.alt | escape }}">
+
+                    <noscript>
+                      <img class="product-single__photo" src="{{ image.src | img_url: 'master' }}"
+                        alt="{{ image.alt | escape }}"
+                        data-image-id="{{ image.id }}">
+                    </noscript>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div> <!-- product-single__photos -->
+
+      </div> <!-- grid__items -->
+    </div>
+
+    <style>
+      @media (max-width: 990px) {
+        .product-meta_height {
+          width: 100%;
+          padding-right: 0;
+        }        
+      }
+    </style>
+
+    <!--
+    <style>
+      .product-single__photo--flex .mfp-wrap.mfp-gallery.mfp-close-btn-in.mfp-fade.mfp-ready {
+          position: absolute;
+      }
+
+
+      .product-single__photo--flex .mfp-fade.mfp-wrap.mfp-ready .mfp-content {
+        height: 100%;
+        width: 100%;
+      }
+
+      .product-single__photo--flex .mfp-figure:after {
+        background-color: none;
+      }
+
+      @media screen and (min-width: 991px) {
+        .product-single__photos.owl-carousel { 
+          display: none;
+        }
+      }
+    </style>
+     -->
+
+    <!--
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('.size_chart').magnificPopup({
+          type:'inline',
+          midClick: true,
+          closeBtnInside: true,
+          closeMarkup: '<button title="%title%" type="button" class="mfp-close"> close chart </button>'
+        });
+      });
+    </script>
+    -->
+
+    {% unless product == empty %}
+      <script type="application/json" id="ProductJson-{{ section.id }}">
+        {% render 'product-json', product: product %}
+      </script>
+    {% endunless %}
+  {% endif %}
+</div>
+
+{% schema %}
+  {
+    "name": "Launch Product",
+    "settings": [
+      {
+        "id": "product",
+        "type": "product",
+        "label": "Product"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Launch Product",
+        "category": "Undefeated"
+      }
+    ]
+  }
+{% endschema %}
