@@ -3008,5 +3008,17 @@
         "default": false
       }
     ]
+  },
+  {
+    "name": "Restrict Site",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "restrict_site",
+        "label": "Restrict Site",
+        "default": false,
+        "info": "When enabled, the main menu will be removed and all shopping pages will redirect to the homepage (/product, /collection, /search)."
+      }
+    ]
   }
 ]

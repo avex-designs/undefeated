@@ -1,3 +1,8 @@
+{% if settings.restrict_site %}
+  {% layout none %}
+  <script type="text/javascript">window.location = '/';</script>
+{% endif %}
+
 <!-- /templates/product.liquid -->
 {% comment %}
   The contents of the product.liquid template can be found in /sections/product-template.liquid

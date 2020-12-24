@@ -1,3 +1,8 @@
+{% if settings.restrict_site %}
+  {% layout none %}
+  <script type="text/javascript">window.location = '/';</script>
+{% endif %}
+
 <!-- /templates/collection.liquid -->
 {% comment %}
   The contents of the collection.liquid template can be found in /sections/collection-template.liquid
