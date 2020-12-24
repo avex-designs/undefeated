@@ -4670,11 +4670,12 @@ theme.ShoppableProducts = (function() {
     filterCarousel: function() {
       if (this.carousel === null) return;
 
-      if (this.$colorSelect.val() != '-') {
-        var selectedColor = this.$colorSelect.val().toLowerCase().replace(' ', '');
-        var key = '.' + selectedColor;
+      var val = this.$colorSelect.val();
 
-        this.carousel.owlcarousel2_filter(key);
+      if (val && val != '-') {
+        var selectedColor = val.toLowerCase().replace(' ', '');
+
+        this.carousel.owlcarousel2_filter('.' + selectedColor);
       }
     },
     createZoom: function() {

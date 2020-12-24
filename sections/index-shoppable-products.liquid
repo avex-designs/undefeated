@@ -212,7 +212,7 @@
               </div>
 
               <script type="application/json" data-product-json>
-                {{ product | json }}
+                {% render 'product-json', product: product %}
               </script>
             </div> 
           </div>

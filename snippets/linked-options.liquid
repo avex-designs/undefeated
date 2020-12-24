@@ -96,7 +96,7 @@ Shopify.linkOptionSelectors = function(product) {
     }
     var config = { childList: true, subtree: true };
     var observer = new MutationObserver(function() {      
-      Shopify.linkOptionSelectors({{ product | json }});
+      Shopify.linkOptionSelectors({% render 'product-json', product: product %});
       observer.disconnect();
     });  
     observer.observe($addToCartForm[0], config);
