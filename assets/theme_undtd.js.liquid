@@ -4783,6 +4783,7 @@ theme.LaunchProduct = (function() {
     this.$sku = $(selectors.SKU, this.$container);
     this.$colorSelect = $(selectors.colorSelect, this.$container);
     this.$productImages = $(selectors.productImages, this.$container);
+    this.$productImagePhotos = $(selectors.productImagePhoto, this.$container);
     this.$productFlexWrapper = $(selectors.productImagePhotoFlexWrapper, this.$container);
 
     this.$colorSelect.on('change', this.onColorSelectChange.bind(this));
@@ -4790,7 +4791,6 @@ theme.LaunchProduct = (function() {
     this.initBreakpoints();
     this.stringOverrides();
     this.initProductVariant();
-    // this.initStickyProductMeta();
     this.productThumbnailSwitch();    
 
     if (this.zoomType) {
@@ -4807,22 +4807,7 @@ theme.LaunchProduct = (function() {
       });
     }
 
-    if ($(window).width() >= 991) {
-        var selectedColor = this.$colorSelect.val();
-        var selectedFilter = selectedColor.replace(/\s/g, ''); // replace ALL blank spaces
-        var onLoadSelect = selectedFilter.toLowerCase()
-        this.$productFlexWrapper.hide();
-        this.$productFlexWrapper.filter('[data-variant="'+onLoadSelect+'"]').fadeIn('slow');
-
-        // console.log('page load - filter colors images / above 991 - PDP');
-    }
-
-    // $window
-    //   .on('load' + this.settings.namespace, theme.initStickyProductMeta)
-    //   .on(
-    //     'resize' + this.settings.namespace,
-    //     theme.debounce(this.initStickyProductMeta, 150).bind(this)
-    //   );    
+    this.onColorSelectChange();
   }
 
   LaunchProduct.prototype = _.assignIn({}, LaunchProduct.prototype, {
@@ -4846,21 +4831,13 @@ theme.LaunchProduct = (function() {
       enquire.register(theme.variables.mediaQuerySmallZOR, {
         match: function() {
           self.createImageCarousel();
-
-          //if (self.zoomType) {
-            //if ($(self.selectors.productImagePhoto).length) {
-              // remove event handlers for product zoom on mobile
-              $(selectors.productImagePhoto).off();
-            //}
-          //}
+          // self.$productImagePhotos.off();
+          // self.$productImages.off();
+          $(selectors.productImagePhoto, self.$container).off('click');
         },
         unmatch: function() {
           self.destroyImageCarousel();
-          // self.reorderImages();
-          //if (self.zoomType) {
-            // reinit product zoom
-            //self.productImageZoom();
-          //}
+          self.productImageZoom();
         }
       });
     },
@@ -4937,6 +4914,8 @@ theme.LaunchProduct = (function() {
       }
     },
     productImageZoom: function() {
+      if ($(window).width() < 991) return;
+
       var delegate = selectors.productImagePhoto;
       var selectedColor = this.$colorSelect.val().replace(/\s/g, '').toLowerCase();
 
@@ -4944,26 +4923,28 @@ theme.LaunchProduct = (function() {
         delegate = '[data-variant="'+selectedColor+'"] ' + delegate;
       }
 
-      this.$productImages.magnificPopup({
-        delegate: delegate,
-        type: 'image',
-        midClick: true,
-        mainClass: 'mfp-fade',
-        closeOnBgClick: true,
-        closeBtnInside: false,
-        closeMarkup: '<button title="Close (Esc)" type="button" class="mfp-close"> <img src="https://cdn.shopify.com/s/files/1/2206/5449/files/close-modal.svg?5305"/> </button>',
-        closeOnContentClick: true,
-        tClose: theme.strings.zoomClose,
-        removalDelay: 500,
-        gallery: {
-          enabled: true,
-          navigateByImgClick: false,
-          arrowMarkup:
-            '<button title="%title%" type="button" class="mfp-arrow mfp-arrow-%dir%"><span class="mfp-chevron mfp-chevron-%dir%"></span></button>',
-          tPrev: theme.strings.zoomPrev,
-          tNext: theme.strings.zoomNext
-        }
-      });
+      $(selectors.productImagePhoto, this.$container).on('click', function() {
+        this.$productImages.magnificPopup({
+          delegate: delegate,
+          type: 'image',
+          midClick: true,
+          mainClass: 'mfp-fade',
+          closeOnBgClick: true,
+          closeBtnInside: false,
+          closeMarkup: '<button title="Close (Esc)" type="button" class="mfp-close"> <img src="https://cdn.shopify.com/s/files/1/2206/5449/files/close-modal.svg?5305"/> </button>',
+          closeOnContentClick: true,
+          tClose: theme.strings.zoomClose,
+          removalDelay: 500,
+          gallery: {
+            enabled: true,
+            navigateByImgClick: false,
+            arrowMarkup:
+              '<button title="%title%" type="button" class="mfp-arrow mfp-arrow-%dir%"><span class="mfp-chevron mfp-chevron-%dir%"></span></button>',
+            tPrev: theme.strings.zoomPrev,
+            tNext: theme.strings.zoomNext
+          }
+        });
+      }.bind(this))
     },
     filterCarousel: function() {
       if (this.carousel === null || this.carousel === undefined) return;
@@ -4977,6 +4958,7 @@ theme.LaunchProduct = (function() {
     createImageCarousel: function() {
       this.$productImages.addClass(classes.owlCarousel);
 
+      // this.carousel && this.$productImages.owlCarousel('destroy.owl.carousel');
       this.carousel = this.$productImages.owlCarousel({
         loop: true,
         margin: 0,
@@ -4989,41 +4971,42 @@ theme.LaunchProduct = (function() {
 
       this.filterCarousel();
 
-      $(window).on('resize', theme.debounce(function() {
-        if ( $(window).width() >= 991 ) {
-          if (this.$productImages.hasClass('owl-carousel') ) {
+      return;
 
-            this.$productFlexWrapper.hide();
+      // $(window).on('resize', theme.debounce(function() {
+      //   if ( $(window).width() >= 991 ) {
+      //     if (this.$productImages.hasClass('owl-carousel') ) {
+      //       this.$productFlexWrapper.hide();
             
-            this.carousel && this.carousel.owlcarousel2_filter( '*' );
-            // console.log('RESIZE 250 - owlfilter 250')
+      //       this.carousel && this.carousel.owlcarousel2_filter( '*' );
+      //       // console.log('RESIZE 250 - owlfilter 250')
 
-            var selectedColor = ($('select.color-select').val() && $('select.color-select').val().toLowerCase() || '-');
-            var selectedFilter = selectedColor.replace(/\s/g, '');
+      //       var selectedColor = ($('select.color-select').val() && $('select.color-select').val().toLowerCase() || '-');
+      //       var selectedFilter = selectedColor.replace(/\s/g, '');
                     
-            setTimeout(function(){
-                this.carousel && this.carousel.owlCarousel('destroy');
-                this.carousel = null;
-                this.$productImages.removeClass(classes.owlCarousel);
-                     
-                if (selectedColor == '-') {
-                  this.$productFlexWrapper.fadeIn('slow');
-                } else {
-                  this.$productFlexWrapper.filter('[data-variant="'+selectedFilter+'"]').fadeIn('slow');
-                }
-            }.bind(this), 500);
+      //       setTimeout(function(){
+      //         // this.carousel && this.carousel.owlCarousel('destroy');
+      //         // this.carousel = null;
+      //         this.$productImages.removeClass(classes.owlCarousel);
+                   
+      //         if (selectedColor == '-') {
+      //           this.$productFlexWrapper.fadeIn('slow');
+      //         } else {
+      //           this.$productFlexWrapper.filter('[data-variant="'+selectedFilter+'"]').fadeIn('slow');
+      //         }
+      //       }.bind(this), 500);
 
-            // console.log('RESIZE create carousel - destroy slider / resize above 991 - b');
-          }
-        }
-      }.bind(this), 50));
+      //       // console.log('RESIZE create carousel - destroy slider / resize above 991 - b');
+      //     }
+      //   }
+      // }.bind(this), 50));
     },
     destroyImageCarousel: function() {
       if (!this.$productImages.length) return;
 
       this.$productFlexWrapper.show();
 
-      if ( $(window).width() >= 991 ) {
+      if ($(window).width() >= 991) {
         if (this.$productImages.hasClass('owl-carousel') ) {
 
           // this.$productFlexWrapper.hide();
@@ -5031,26 +5014,17 @@ theme.LaunchProduct = (function() {
           // this.carousel && this.carousel.owlcarousel2_filter( '*' );
           // console.log('RESIZE 250 - owlfilter 250')
 
-          this.carousel && this.carousel.owlCarousel('destroy');
+          this.carousel && this.$productImages.owlCarousel('destroy');
           this.carousel = null;          
+          this.$productImages.removeClass(classes.owlCarousel);
 
           this.$productFlexWrapper.hide();
 
-          var selectedColor = ($('select.color-select').val() && $('select.color-select').val().toLowerCase() || '-');
-          var selectedFilter = selectedColor.replace(/\s/g, '');
+          // var selectedColor = ($('select.color-select').val() && $('select.color-select').val().toLowerCase() || '-');
+          // var selectedFilter = selectedColor.replace(/\s/g, '');
 
           setTimeout(function(){
-              // this.$productFlexWrapper.hide();
-              // this.carousel && this.carousel.owlCarousel('destroy');
-              // this.carousel = null;
-              this.$productImages.removeClass(classes.owlCarousel);
-
-
-              // if (selectedColor == '-') {
-              //   this.$productFlexWrapper.fadeIn('slow');
-              // } else {
-              //   this.$productFlexWrapper.filter('[data-variant="'+selectedFilter+'"]').fadeIn('slow');
-              // }
+            this.$productFlexWrapper.fadeIn('slow');
           }.bind(this), 500);
 
           // console.log('RESIZE create carousel - destroy slider / resize above 991 - b');

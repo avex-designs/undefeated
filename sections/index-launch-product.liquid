@@ -64,9 +64,8 @@
                     <div class="prod_details_noise wrappy"> 
                       <div class="deets_wrap">
                         <div class="details">
-                          <div id="tabs" class="prod_details_lunks">
-                            <span> <a id="tab1" class="deets_link mob_deets">Product details</a> </span>
-                            <span> <a id="tab2" class="size_chart mob_size_chart" href="#size-chart"> View size chart </a> </span>
+                          <div class="prod_details_lunks">
+                            <span style="text-decoration: underline;">Product details</span>
                           </div>
                           <div class="details-content">
                             <span class="tab-container mob_pdp_desc" id="tab1C">
@@ -194,7 +193,6 @@
                                       {{ value | escape }}{% if is_disabled %} - SOLD OUT{% endif %}
                                     </option>                                      
                                   {% endfor %}
-
                                 {% endif %}
 
                                 </select>
@@ -202,34 +200,7 @@
                             {% endif %}
 
                           </div> <!-- radio-wrapper product-form__item -->
-
-                          {% if option.name == 'Color' or option.name == 'Color' %}
-                              {% for value in option.values limit:1 %}
-                                {% unless value == "-" %}
-                                  <style>
-                                   /* .product-single__photo--flex-wrapper { display:none; } */
-                                  </style>
-                                    <script type="text/javascript">
-                                    $(document).ready(function() {
-                                      /* Page Load Color Variant Image Filter */
-                                      if ( $(window).width() >= 991 ) {
-
-                                          // var selectedColor = $('select.color-select').val();
-                                          // var selectedFilter = selectedColor.replace(/\s/g, ''); // replace ALL blank spaces
-                                          // var onLoadSelect = selectedFilter.toLowerCase()
-                                          // $('.product-single__photo--flex-wrapper').hide();
-                                          // $('[data-variant="'+onLoadSelect+'"]').fadeIn('slow');
-
-                                          // console.log('page load - filter colors images / above 991 - PDP');
-                                      }
-                                    });
-                                    </script>
-                                  {% endunless %}
-                              {% endfor %}
-                          {% endif %}
-
                         {% endfor %}
-
                       {% endunless %}
 
                       <select name="id" id="ProductSelect" class="product-single__variants no-js" data-variant-select>
