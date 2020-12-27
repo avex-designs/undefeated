@@ -99,102 +99,102 @@
             
             {% include 'mobile-nav' %}
 
-            
-            <nav id="main_nav" class="nav-menu-wrapper medium-down--hide" role="navigation">
-              
-              <!-- begin site-nav -->
-              <ul class="site-nav" id="AccessibleNav">
-                {% for link in linklists[section.settings.main_menu_link_list].links %}
-                  {% if link.links != blank %}
-                  {% assign parent_index = forloop.index %}
-                    <li
-                      class="site-nav__item site-nav--has-dropdown {% if link.active %}site-nav--active{% endif %}"
-                      aria-haspopup="true"
-                      data-meganav-type="parent">
-                      <a
-                        href="{{ link.url }}"
-                        class="site-nav__link"
-                        data-meganav-type="parent"
-                        aria-controls="MenuParent-{{ parent_index }}"
-                        aria-expanded="false"
-                        {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
-                          {{ link.title | escape }}
-                          <span class="icon icon-arrow-down" aria-hidden="true"></span>
-                      </a>
-                      <ul
-                        id="MenuParent-{{ parent_index }}"
-                        class="site-nav__dropdown {% if link.levels == 2 %}site-nav--has-grandchildren{% endif %}"
-                        data-meganav-dropdown>
-                        {% for childlink in link.links %}
-                          {% if childlink.links != blank %}
-                          {% assign child_index = forloop.index %}
-                            <li
-                              class="site-nav__item site-nav--has-dropdown site-nav--has-dropdown-grandchild {% if childlink.active %}site-nav--active{% endif %}"
-                              aria-haspopup="true">
-                              <a
-                                href="{{ childlink.url }}"
-                                class="site-nav__dropdown-link"
-                                aria-controls="MenuChildren-{{ parent_index }}-{{ child_index }}"
-                                data-meganav-type="parent"
-                                {% unless template.name == 'index' %}{% if childlink.active %}aria-current="page"{% endif %}{% endunless%}
-                                tabindex="-1">
-                                  {{ childlink.title | escape }}
-                                  <span class="icon icon-arrow-down" aria-hidden="true"></span>
-                              </a>
-                              <div class="site-nav__dropdown-grandchild">
-                                <ul
-                                  id="MenuChildren-{{ parent_index }}-{{ child_index }}"
-                                  data-meganav-dropdown>
-                                  {% for grandchildlink in childlink.links %}
-                                    <li{% if grandchildlink.active %} class="site-nav--active"{% endif %}>
-                                      <a
-                                        href="{{ grandchildlink.url }}"
-                                        class="site-nav__dropdown-link"
-                                        data-meganav-type="child"
-                                        {% unless template.name == 'index' %}{% if grandchildlink.active %}aria-current="page"{% endif %}{% endunless %}
-                                        tabindex="-1">
-                                          {{ grandchildlink.title | escape }}
-                                        </a>
-                                    </li>
-                                  {% endfor %}
-                                </ul>
-                              </div>
-                            </li>
-                          {% else %}
-                            <li{% if childlink.active %} class="site-nav--active"{% endif %}>
-                              <a
-                                href="{{ childlink.url }}"
-                                class="site-nav__dropdown-link"
-                                data-meganav-type="child"
-                                {% if childlink.active %}aria-current="page"{% endif %}
-                                tabindex="-1">
-                                  {{ childlink.title | escape }}
-                              </a>
-                            </li>
-                          {% endif %}
-                        {% endfor %}
-                      </ul>
-                    </li>
-                  {% else %}
-                    <li class="site-nav__item{% if link.active %} site-nav--active{% endif %}">
-                      <a
-                        href="{{ link.url }}"
-                        class="site-nav__link"
-                        data-meganav-type="child"
-                        {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
-                          {{ link.title | escape }}
-                      </a>
-                    </li>
-                  {% endif %}
-                {% endfor %}
+            {% unless settings.restrict_site %}
+              <nav id="main_nav" class="nav-menu-wrapper medium-down--hide" role="navigation">
+                
+                <!-- begin site-nav -->
+                <ul class="site-nav" id="AccessibleNav">
+                  {% for link in linklists[section.settings.main_menu_link_list].links %}
+                    {% if link.links != blank %}
+                    {% assign parent_index = forloop.index %}
+                      <li
+                        class="site-nav__item site-nav--has-dropdown {% if link.active %}site-nav--active{% endif %}"
+                        aria-haspopup="true"
+                        data-meganav-type="parent">
+                        <a
+                          href="{{ link.url }}"
+                          class="site-nav__link"
+                          data-meganav-type="parent"
+                          aria-controls="MenuParent-{{ parent_index }}"
+                          aria-expanded="false"
+                          {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
+                            {{ link.title | escape }}
+                            <span class="icon icon-arrow-down" aria-hidden="true"></span>
+                        </a>
+                        <ul
+                          id="MenuParent-{{ parent_index }}"
+                          class="site-nav__dropdown {% if link.levels == 2 %}site-nav--has-grandchildren{% endif %}"
+                          data-meganav-dropdown>
+                          {% for childlink in link.links %}
+                            {% if childlink.links != blank %}
+                            {% assign child_index = forloop.index %}
+                              <li
+                                class="site-nav__item site-nav--has-dropdown site-nav--has-dropdown-grandchild {% if childlink.active %}site-nav--active{% endif %}"
+                                aria-haspopup="true">
+                                <a
+                                  href="{{ childlink.url }}"
+                                  class="site-nav__dropdown-link"
+                                  aria-controls="MenuChildren-{{ parent_index }}-{{ child_index }}"
+                                  data-meganav-type="parent"
+                                  {% unless template.name == 'index' %}{% if childlink.active %}aria-current="page"{% endif %}{% endunless%}
+                                  tabindex="-1">
+                                    {{ childlink.title | escape }}
+                                    <span class="icon icon-arrow-down" aria-hidden="true"></span>
+                                </a>
+                                <div class="site-nav__dropdown-grandchild">
+                                  <ul
+                                    id="MenuChildren-{{ parent_index }}-{{ child_index }}"
+                                    data-meganav-dropdown>
+                                    {% for grandchildlink in childlink.links %}
+                                      <li{% if grandchildlink.active %} class="site-nav--active"{% endif %}>
+                                        <a
+                                          href="{{ grandchildlink.url }}"
+                                          class="site-nav__dropdown-link"
+                                          data-meganav-type="child"
+                                          {% unless template.name == 'index' %}{% if grandchildlink.active %}aria-current="page"{% endif %}{% endunless %}
+                                          tabindex="-1">
+                                            {{ grandchildlink.title | escape }}
+                                          </a>
+                                      </li>
+                                    {% endfor %}
+                                  </ul>
+                                </div>
+                              </li>
+                            {% else %}
+                              <li{% if childlink.active %} class="site-nav--active"{% endif %}>
+                                <a
+                                  href="{{ childlink.url }}"
+                                  class="site-nav__dropdown-link"
+                                  data-meganav-type="child"
+                                  {% if childlink.active %}aria-current="page"{% endif %}
+                                  tabindex="-1">
+                                    {{ childlink.title | escape }}
+                                </a>
+                              </li>
+                            {% endif %}
+                          {% endfor %}
+                        </ul>
+                      </li>
+                    {% else %}
+                      <li class="site-nav__item{% if link.active %} site-nav--active{% endif %}">
+                        <a
+                          href="{{ link.url }}"
+                          class="site-nav__link"
+                          data-meganav-type="child"
+                          {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
+                            {{ link.title | escape }}
+                        </a>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
 
-              </ul> <!-- // MAIN MENU site-nav -->
-            </nav>
+                </ul> <!-- // MAIN MENU site-nav -->
+              </nav>
+            {% endunless %}
             
             <nav id="utility_nav" class="nav-menu-wrapper medium-down--hide" role="navigation">                     <!-- begin site-nav -->
               <ul class="site-nav" id="Utility_Nav">
-                
-              
+                {% unless settings.restrict_site %}
                   <li class="site-nav__item site-nav--search__bar auto-search-header">
                     <div class="search-bar-wrappa">
                     {% include 'search-bar-auto', search_btn_style: 'btn-account', search_bar_location: 'search-bar--header-auto' %}
@@ -203,6 +203,7 @@
                       Search
                     </a>
                   </li>
+                {% endunless %}
 
                 {% if shop.customer_accounts_enabled %}
                   <li class="site-nav__item site-nav__expanded-item site-nav__item--compressed">
@@ -246,33 +247,29 @@
           </div> <!-- header_content_contaner -->
 
           <div id="mobile-dropwdown">
-          {% include 'drawer-menu-drop' %}
+            {% include 'drawer-menu-drop' %}
           </div>
           
           <div id="banana">
             <div class="white-bg">
               <div id="CartDrawer" class="wrappa">
-                  <div class="accounts_wrap">
-                  
-                    {% unless customer %}
-                      {% include 'dropdown-login' %}
-                    {% else %}
+                <div class="accounts_wrap">
+                  {% unless customer %}
+                    {% include 'dropdown-login' %}
+                  {% else %}
 
-                      {% include 'dropdown-checkout' %}
-
-                    {% endunless %}
-                  
-                  </div>
-                  <div class="drop_50{% if customer %} be-logged{% endif %}">
-                      <div class="cart_wrap">
-                        <div class="drawer__inner">
-                           
-                          <div id="CartContainer" class="drawer__cart">
-                            <p class="cart--empty-message">Loading...</p>
-                          </div>
+                    {% include 'dropdown-checkout' %}
+                  {% endunless %}
+                </div>
+                <div class="drop_50{% if customer %} be-logged{% endif %}">
+                    <div class="cart_wrap">
+                      <div class="drawer__inner">
+                        <div id="CartContainer" class="drawer__cart">
+                          <p class="cart--empty-message">Loading...</p>
                         </div>
-                      </div><!-- cart wrap -->
-                  </div>
+                      </div>
+                    </div><!-- cart wrap -->
+                </div>
               </div><!-- #CartDrawer -->
             </div><!-- .white-bg -->
           </div> <!-- banana -->

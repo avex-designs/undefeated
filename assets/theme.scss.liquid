@@ -3482,6 +3482,10 @@ button.mfp-arrow {
     //padding-bottom: 55px;
   }
 
+  .shoppable-product & {
+    margin: 0;
+  }
+
   .slick-dots {
     //background-color: $colorProductBackground;
     bottom: 0;
@@ -6444,11 +6448,15 @@ PRODUCT PAGE NOISE
     //display: flex;
     //flex-wrap: wrap;
   
-    >* {
+    > * {
     	//flex: 0 0 auto;
     	width: 50%;
       
-        @include un_mb { width: 100%; }
+      @include un_mb { width: 100%; }
+
+      .shoppable-product & {
+          width: 100%;
+      }
     }
 }
 
@@ -6461,10 +6469,10 @@ PRODUCT PAGE NOISE
     padding: 1.25rem;
     margin-right: -1.25rem;
   
-    >* {
+    > * {
       width: 100%;
       
-        @include un_mb { width: 100%; }
+      @include un_mb { width: 100%; }
     }
 }
 
@@ -6530,6 +6538,16 @@ PRODUCT PAGE NOISE
         padding: 1.25rem;
         float:left;
     }
+
+    .shoppable-product & {
+      margin: 0;
+      width: 100%;
+
+      .product-single__photo--flex-wrapper {
+        float: none;
+        padding: 0;
+      }
+    }
 }
 
 .product-single__extra-notes {
@@ -6567,7 +6585,7 @@ PRODUCT PAGE NOISE
    
     .radio-wrapper .single-option-radio__label { display: none; }
 
-    h1.product-single__title {
+    .product-single__title {
       margin-left: 1rem;
       word-break: break-word;
     }
@@ -6592,7 +6610,7 @@ PRODUCT PAGE NOISE
       }
     }
   
-    h1.product-single__title,
+    .product-single__title,
     span#ProductPrice,
     .product-single__price--compare-at {
         font-size: 30px;
@@ -6671,8 +6689,8 @@ PRODUCT PAGE NOISE
 
 @media screen and (max-width: $undftd-desk ) {
 
-    h1.product-single__title,
-    span#ProductPrice,
+    .product-single__title,
+    #ProductPrice,
     .product-single__price--compare-at {
         font-size: 1.4rem !important;
     }
@@ -6694,8 +6712,7 @@ PRODUCT PAGE NOISE
     }
 }
 
-.product-single__meta>div h1.product-single__title,
-.product-single__meta>div .product-single__title.h1 {
+.product-single__meta>div .product-single__title {
     margin-left: 0rem;
 }
 
@@ -6783,7 +6800,7 @@ PRODUCT PAGE NOISE
         }
       
         .btn--add-to-cart,
-        h1.product-single__title,
+        .product-single__title,
         span#ProductPrice {
             font-size: 1.375rem !important;
         }
@@ -6824,7 +6841,7 @@ PRODUCT PAGE NOISE
 
         .yada { padding-top: .25rem; }
 
-        h1.product-single__title {  margin-bottom: 0; }
+        .product-single__title {  margin-bottom: 0; }
     }
 
     .wrappy .notes,

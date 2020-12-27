@@ -1,99 +1,103 @@
   <div class="drawer__inner drawer-left__inner">
-
-
-    {% if section.settings.drawer_search_enable %}
-      {% include 'search-bar', search_btn_style: 'btn--secondary', search_bar_location: 'search-bar--drawer' %}
-    {% endif %}
+    {% unless settings.restrict_site %}
+      {% if section.settings.drawer_search_enable %}
+        {% include 'search-bar', search_btn_style: 'btn--secondary', search_bar_location: 'search-bar--drawer' %}
+      {% endif %}
+    {% endunless %}
 
     <ul class="mobile-nav">
-      {% for link in linklists[section.settings.main_menu_link_list].links %}
-        {% if link.links != blank %}
-          <li class="mobile-nav__item">
-            <div class="mobile-nav__has-sublist">
-              <a
-                href="{{ link.url }}"
-                class="mobile-nav__link"
-                id="Label-{{ forloop.index }}"
-                {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless %}>{{ link.title | escape }}</a>
-              <div class="mobile-nav__toggle">
-                <button type="button" class="mobile-nav__toggle-btn icon-fallback-text" aria-controls="Linklist-{{ forloop.index }}" aria-expanded="false">
-                  <span class="icon-fallback-text mobile-nav__toggle-open">
-                    <span class="icon icon-plus" aria-hidden="true"></span>
-                    <span class="fallback-text">{{ 'general.drawers.expand_submenu' | t }} {{ link.title | escape }}</span>
-                  </span>
-                  <span class="icon-fallback-text mobile-nav__toggle-close">
-                    <span class="icon icon-minus" aria-hidden="true"></span>
-                    <span class="fallback-text">{{ 'general.drawers.collapse_submenu' | t }} {{ link.title | escape }}</span>
-                  </span>
-                </button>
+      {% unless settings.restrict_site %}
+        {% for link in linklists[section.settings.main_menu_link_list].links %}
+          {% if link.links != blank %}
+            <li class="mobile-nav__item">
+              <div class="mobile-nav__has-sublist">
+                <a
+                  href="{{ link.url }}"
+                  class="mobile-nav__link"
+                  id="Label-{{ forloop.index }}"
+                  {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless %}>
+                  {{ link.title | escape }}
+                </a>
+                <div class="mobile-nav__toggle">
+                  <button type="button" class="mobile-nav__toggle-btn icon-fallback-text" aria-controls="Linklist-{{ forloop.index }}" aria-expanded="false">
+                    <span class="icon-fallback-text mobile-nav__toggle-open">
+                      <span class="icon icon-plus" aria-hidden="true"></span>
+                      <span class="fallback-text">{{ 'general.drawers.expand_submenu' | t }} {{ link.title | escape }}</span>
+                    </span>
+                    <span class="icon-fallback-text mobile-nav__toggle-close">
+                      <span class="icon icon-minus" aria-hidden="true"></span>
+                      <span class="fallback-text">{{ 'general.drawers.collapse_submenu' | t }} {{ link.title | escape }}</span>
+                    </span>
+                  </button>
+                </div>
               </div>
-            </div>
-            <ul class="mobile-nav__sublist" id="Linklist-{{ forloop.index }}" aria-labelledby="Label-{{ forloop.index }}" role="navigation">
-              {% assign parent_index = forloop.index %}
-              {% for childlink in link.links %}
-                {% if childlink.links != blank %}
-                <li class="mobile-nav__item">
-                  <div class="mobile-nav__has-sublist">
+              <ul class="mobile-nav__sublist" id="Linklist-{{ forloop.index }}" aria-labelledby="Label-{{ forloop.index }}" role="navigation">
+                {% assign parent_index = forloop.index %}
+                {% for childlink in link.links %}
+                  {% if childlink.links != blank %}
+                  <li class="mobile-nav__item">
+                    <div class="mobile-nav__has-sublist">
+                      <a
+                        href="{{ childlink.url }}"
+                        class="mobile-nav__link"
+                        id="Label-{{ parent_index }}-{{ forloop.index }}"
+                        {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
+                          {{ childlink.title }}
+                      </a>
+                      <div class="mobile-nav__toggle">
+                        <button type="button" class="mobile-nav__toggle-btn icon-fallback-text" aria-controls="Linklist-{{ parent_index }}-{{ forloop.index }}" aria-expanded="false">
+                          <span class="icon-fallback-text mobile-nav__toggle-open">
+                            <span class="icon icon-plus" aria-hidden="true"></span>
+                            <span class="fallback-text">{{ 'general.drawers.expand_submenu' | t }} {{ link.title | escape }}</span>
+                          </span>
+                          <span class="icon-fallback-text mobile-nav__toggle-close">
+                            <span class="icon icon-minus" aria-hidden="true"></span>
+                            <span class="fallback-text">{{ 'general.drawers.collapse_submenu' | t }} {{ link.title | escape }}</span>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                    <ul class="mobile-nav__sublist mobile-nav__subsublist" id="Linklist-{{ parent_index }}-{{ forloop.index }}" aria-labelledby="Label-{{ parent_index }}-{{ forloop.index }}" role="navigation">
+                      {% for grandchildlink in childlink.links %}
+                        <li class="mobile-nav__item">
+                          <a
+                            href="{{ grandchildlink.url }}"
+                            class="mobile-nav__link"
+                            {% unless template.name == 'index' %}{% if grandchildlink.active %}aria-current="page"{% endif %}{% endunless%}>
+                              {{ grandchildlink.title | escape }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </li>
+                  {% else %}
+                  <li class="mobile-nav__item">
                     <a
                       href="{{ childlink.url }}"
                       class="mobile-nav__link"
-                      id="Label-{{ parent_index }}-{{ forloop.index }}"
-                      {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless%}>
-                        {{ childlink.title }}
+                      {% unless template.name == 'index' %}{% if childlink.active %}aria-current="page"{% endif %}{% endunless%}>
+                        {{ childlink.title | escape }}
                     </a>
-                    <div class="mobile-nav__toggle">
-                      <button type="button" class="mobile-nav__toggle-btn icon-fallback-text" aria-controls="Linklist-{{ parent_index }}-{{ forloop.index }}" aria-expanded="false">
-                        <span class="icon-fallback-text mobile-nav__toggle-open">
-                          <span class="icon icon-plus" aria-hidden="true"></span>
-                          <span class="fallback-text">{{ 'general.drawers.expand_submenu' | t }} {{ link.title | escape }}</span>
-                        </span>
-                        <span class="icon-fallback-text mobile-nav__toggle-close">
-                          <span class="icon icon-minus" aria-hidden="true"></span>
-                          <span class="fallback-text">{{ 'general.drawers.collapse_submenu' | t }} {{ link.title | escape }}</span>
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                  <ul class="mobile-nav__sublist mobile-nav__subsublist" id="Linklist-{{ parent_index }}-{{ forloop.index }}" aria-labelledby="Label-{{ parent_index }}-{{ forloop.index }}" role="navigation">
-                    {% for grandchildlink in childlink.links %}
-                      <li class="mobile-nav__item">
-                        <a
-                          href="{{ grandchildlink.url }}"
-                          class="mobile-nav__link"
-                          {% unless template.name == 'index' %}{% if grandchildlink.active %}aria-current="page"{% endif %}{% endunless%}>
-                            {{ grandchildlink.title | escape }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </li>
-                {% else %}
-                <li class="mobile-nav__item">
-                  <a
-                    href="{{ childlink.url }}"
-                    class="mobile-nav__link"
-                    {% unless template.name == 'index' %}{% if childlink.active %}aria-current="page"{% endif %}{% endunless%}>
-                      {{ childlink.title | escape }}
-                  </a>
-                </li>
-                {% endif %}
-              {% endfor %}
-            </ul>
-          </li>
+                  </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </li>
 
-        {% else %}
+          {% else %}
 
-          <li class="mobile-nav__item">
-            <a
-              href="{{ link.url }}"
-              class="mobile-nav__link"
-              {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless %}>
-                {{ link.title | escape }}
-            </a>
-          </li>
+            <li class="mobile-nav__item">
+              <a
+                href="{{ link.url }}"
+                class="mobile-nav__link"
+                {% unless template.name == 'index' %}{% if link.active %}aria-current="page"{% endif %}{% endunless %}>
+                  {{ link.title | escape }}
+              </a>
+            </li>
 
-        {% endif %}
-      {% endfor %}
+          {% endif %}
+        {% endfor %}
+      {% endunless %}
 
       {% comment %}
         Spacer element

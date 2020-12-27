@@ -1,18 +1,19 @@
 <div class="desk--hide">
   <div class="mob-first-row">
-
-   <div>
-    <div class="mob-search-bar-wrappa">
-      {% include 'search-bar-auto', search_btn_style: 'btn-account', search_bar_location: 'search-bar--header-auto' %}
-    </div>
-    <a href="/search" id="mob_search_init_btnzor" class="site-nav__link site-nav__link--icon" {% comment %}{% if search_modal %} js-toggle-search-modal{% endif %}" data-mfp-src="#SearchModal"{% endcomment %}>
-      <span class="icon-fallback-text">
-        <img src="{{ 'search.svg' | file_url }}" alt="search icon">
-        <!--<span class="icon icon-search" aria-hidden="true"></span>-->
-        <span class="fallback-text">{{ 'general.search.title' | t }}</span>
-      </span>
-    </a><!-- search -->
-  </div>
+    {% unless settings.restrict_site %}
+      <div>
+        <div class="mob-search-bar-wrappa">
+          {% include 'search-bar-auto', search_btn_style: 'btn-account', search_bar_location: 'search-bar--header-auto' %}
+        </div>
+        <a href="/search" id="mob_search_init_btnzor" class="site-nav__link site-nav__link--icon" {% comment %}{% if search_modal %} js-toggle-search-modal{% endif %}" data-mfp-src="#SearchModal"{% endcomment %}>
+          <span class="icon-fallback-text">
+            <img src="{{ 'search.svg' | file_url }}" alt="search icon">
+            <!--<span class="icon icon-search" aria-hidden="true"></span>-->
+            <span class="fallback-text">{{ 'general.search.title' | t }}</span>
+          </span>
+        </a><!-- search -->
+      </div>
+    {% endunless %}
 
     {% comment %}
     <a href="/cart" class="site-nav__link cart-link js-drawer-open-button-right" aria-controls="CartDrawer">

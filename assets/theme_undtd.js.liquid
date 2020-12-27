@@ -784,7 +784,6 @@ var ajaxCart = (function(module, $) {
     $cartCountSelector,
     $cartCostSelector,
     $cartContainer,
-
     $cartContainer_Drawer,
     $cartContainer_ATC;
 
@@ -800,13 +799,10 @@ var ajaxCart = (function(module, $) {
     adjustCartCallback,
     qtySelectors,
     validateQty,
-
-	cartUpdateCallbackZOR,
-
-	cartUpdateCallbackZORdrawer,
-	buildCartdrawer,
-
-	cartCallback_ATC,
+	  cartUpdateCallbackZOR,
+	  cartUpdateCallbackZORdrawer,
+	  buildCartdrawer,
+	  cartCallback_ATC,
     buildCart_ATC,
     cartUpdateCallback_ATC;
 
@@ -895,6 +891,7 @@ var ajaxCart = (function(module, $) {
     $formContainer.on('submit', function(evt) {
       evt.preventDefault();
 
+      var $form = $(evt.currentTarget); // This plugin is fucked, need to pass the actual form to the callbacks because $formContainer gets overwritten when we initialize the plugin multiple times
       // Add class to be styled if desired
       $addToCart.removeClass('is-added').addClass('is-adding');
 
@@ -903,28 +900,30 @@ var ajaxCart = (function(module, $) {
 
       ShopifyAPI.addItemFromForm(
         evt.target,
-        itemAddedCallback,
-        itemErrorCallback
+        function() {
+          itemAddedCallback($form);
+        },
+        function(XMLHttpRequest) {
+          itemErrorCallback($form, XMLHttpRequest);
+        }
       );
     });
   };
 
-  itemAddedCallback = function() {
+  itemAddedCallback = function($form) {
     $addToCart.removeClass('is-adding').addClass('is-added');
 
     ShopifyAPI.getCart(cartUpdateCallback);
-
     //console.log('added to cart');
-
   };
 
-  itemErrorCallback = function(XMLHttpRequest) {
+  itemErrorCallback = function($form, XMLHttpRequest) {
     var data = eval('(' + XMLHttpRequest.responseText + ')');
     $addToCart.removeClass('is-adding is-added');
 
     if (data.message) {
       if (data.status === 422) {
-        $formContainer.after(
+        $form.after(
           //'<div class="errors qty-error">' + data.description + '</div>'
           '<div class="errors qty-error">This item is already in your cart</div>'
         );
@@ -939,9 +938,7 @@ var ajaxCart = (function(module, $) {
 
   cartUpdateCallback = function(cart) {
     // Update quantity and price
-
-    console.log('added to cart');
-
+    // console.log('added to cart');
     scrollToTop()
 
     //buildCart(cart);
@@ -956,7 +953,6 @@ var ajaxCart = (function(module, $) {
     } else if ( bana == 0 ) {
     	$('.cart-link').removeClass('bold');
     }
-
   };
 
   cartUpdateCallbackZOR = function(cart) {
@@ -1459,12 +1455,9 @@ var ajaxCart = (function(module, $) {
     cartCallback(cart);
     
     setTimeout(function() {
-        $cartContainer_ATC.empty();
+      $cartContainer_ATC.empty();
     }, 2250);
-	
   };
-
-
 
 
   adjustCart = function() {
@@ -3018,7 +3011,7 @@ theme.Product = (function() {
     // Make sure the page doesn't break if no color selector exists!
     if ($colorSelect.length) {
       var selectedColor = $('select.color-select').val();
-      var selectedFilter = selectedColor.replace(' ', '');
+      var selectedFilter = selectedColor.replace(/\s/g, '');
       var onLoadSelect = selectedFilter.toLowerCase();
 
       if ( selectedColor != "-" ) {
@@ -3072,7 +3065,7 @@ theme.Product = (function() {
 		$('select.color-select').on('change',function(event){
 
 			var selectedColor = $(this).val().toLowerCase();
-		    var selectedFilter = selectedColor.replace(' ', '');
+		    var selectedFilter = selectedColor.replace(/\s/g, '');
 		    var onLoadSelect = selectedFilter.toLowerCase()
 
 		    var yanana = $('[data-variant="'+onLoadSelect+'"] img');
@@ -3247,7 +3240,7 @@ theme.Product = (function() {
 		if ( $('select.color-select').val() ) {
 	          if ( $('select.color-select').val() != '-' ) {            
 					var selectedColor = $('select.color-select').val().toLowerCase();
-		          	var selectedFilter = selectedColor.replace(' ', '');
+		          	var selectedFilter = selectedColor.replace(/\s/g, '');
 					var key = '.'+selectedFilter;
 					//console.log(key);
 					owl.owlcarousel2_filter( key );
@@ -3259,7 +3252,7 @@ theme.Product = (function() {
 			if ( $(window).width() < 991 ) {
 
 				var selectedColor = $(this).val().toLowerCase();
-              	var selectedFilter = selectedColor.replace(" ", "");
+              	var selectedFilter = selectedColor.replace(/\s/g, '');
 				var key = '.'+selectedFilter;
 				
 
@@ -3294,7 +3287,7 @@ theme.Product = (function() {
 						//}, 250);
 
 						var selectedColor = ($('select.color-select').val() && $('select.color-select').val().toLowerCase() || '-');
-						var selectedFilter = selectedColor.replace(' ', '');
+						var selectedFilter = selectedColor.replace(/\s/g, '');
 						//console.log(selectedColor + ' create carousel - destroy slider / resize above 991 - b' );
 	                    //console.log(selectedColor + ' create carousel - destroy slider / resize above 991 - b');
 	                  
@@ -3428,7 +3421,7 @@ theme.Product = (function() {
 			}
 
 			var selectedColor = ($('select.color-select').val() && $('select.color-select').val().toLowerCase() || '-');
-			var selectedFilter = selectedColor.replace(' ', '');
+			var selectedFilter = selectedColor.replace(/\s/g, '');
 			//console.log(selectedColor + ' destroy carousel - a');
 	        //console.log(selectedFilter + ' destroy carousel - a');
 
@@ -4469,6 +4462,698 @@ theme.PageAM902020 = (function() {
   return PageAM902020;
 })();
 
+theme.ShoppableProducts = (function() {
+  var selectors = {
+    productJSON: '[data-product-json]',
+    // productImageWrapper: '.product-single__photo-wrapper',
+    productImages: '.product-single__photos',
+    productImagePhoto: '.product-single__photo',
+    productImagePhotoFlexWrapper: '.product-single__photo--flex-wrapper',
+    // productThumbnail: '.product-single__thumbnail',
+    // productImagePhotoContainer: '.product-single__photo--container',
+    // productFullDetails: '.product-single__full-details',
+    // productForm: '.add-to-cart__form',
+    addToCart: '.btn--add-to-cart',
+    addToCartText: '.btn__text',
+    priceContainer: '[data-price-container]',
+    productPrice: '#ProductPrice',
+    SKU: '.variant-sku',
+    priceA11y: '#PriceA11y',
+    comparePrice: '#ComparePrice',
+    comparePriceA11y: '#ComparePriceA11y',
+    comparePriceWrapper: '.product-single__price--wrapper',
+    // quantityElements: '.js-quantity-selector, label + .js-qty',
+    originalSelectorId: '[data-variant-select]',
+    singleOptionSelector: '.single-option-selector__radio',
+    // radioWrapper: '.radio-wrapper',
+    // meta: '.product-single__meta',
+    // productWrapper: '.product-single',
+    // shopifyPaymentButton: '.shopify-payment-button',
+    colorSelect: 'select.color-select',
+    unitPrice: '[data-unit-price]',
+    unitPriceBaseUnit: '[data-unit-price-base-unit]'
+  };
+
+  var classes = {
+    priceContainerUnitAvailable: 'price-container--unit-available',
+    owlCarousel: 'owl-carousel owl-theme'
+  };  
+
+  function ShoppableProduct(el) {
+    this.$el = $(el);
+    this.name = 'ShoppableProduct';
+
+    this.product = JSON.parse($(selectors.productJSON, this.$el).html());
+    this.carousel = null;
+
+    var variantOptions = {
+      $container: this.$el,
+      enabledHistoryState: false,
+      singleOptionSelector: selectors.singleOptionSelector,
+      originalSelectorId: selectors.originalSelectorId,
+      product: this.product
+    };
+
+    this.variants = new slate.Variants(variantOptions);
+
+    this.$addToCart = $(selectors.addToCart, this.$el);
+    this.$addToCartText = $(selectors.addToCartText, this.$el);
+    this.$priceContainer = $(selectors.priceContainer, this.$el);
+    this.$productPrice = $(selectors.productPrice, this.$el);
+    this.$priceA11y = $(selectors.priceA11y, this.$el);
+    // $(this.selectors.quantityElements, this.$container)
+    // $(this.selectors.shopifyPaymentButton, this.$container)    
+    this.$comparePrice = $(selectors.comparePrice, this.$el);
+    this.$comparePriceWrapper = $(selectors.comparePriceWrapper, this.$el);
+    this.$comparePriceA11y = $(selectors.comparePriceA11y, this.$el);
+    this.$unitPrice = $(selectors.unitPrice, this.$el);
+    this.$unitPriceBaseUnit = $(selectors.unitPriceBaseUnit, this.$el);
+    this.$sku = $(selectors.SKU, this.$el);
+    this.$colorSelect = $(selectors.colorSelect, this.$el);
+    this.$productImages = $(selectors.productImages, this.$el);
+    this.$productFlexWrapper = $(selectors.productImagePhotoFlexWrapper, this.$el);
+
+    // Override defaults in theme.strings with potential template overrides
+    theme.productStrings = theme.productStrings || {};
+    $.extend(theme.strings, theme.productStrings); 
+
+    this.createImageCarousel();
+    this.createZoom();
+
+    this.$el.on('variantChange', this.onVariantChange.bind(this));
+    this.$colorSelect.on('change', this.filterCarousel.bind(this));
+
+    if (theme.settings.cartType === 'drawer') {
+      ajaxCart.init({
+        formSelector: this.$el.find('form'),
+        cartContainer: '#CartContainer',
+        addToCartSelector: 'button[type="submit"]',
+        enableQtySelectors: true,
+        moneyFormat: theme.strings.moneyFormat
+      });
+    }    
+  }
+
+  ShoppableProduct.prototype = _.assignIn({}, ShoppableProduct.prototype, {
+    onVariantChange: function(evt) {
+      var moneyFormat = theme.strings.moneyFormat;
+      var variant = evt.variant;
+      var translations = theme.strings;
+
+      if (variant) {
+
+        this.$priceContainer.removeClass('visibility-hidden ' + classes.priceContainerUnitAvailable);
+        this.$productPrice.attr('aria-hidden', 'false');
+
+        // $(this.selectors.priceA11y, this.$container).attr(
+        //   'aria-hidden',
+        //   'false'
+        // );
+
+        // Select a valid variant if available
+        if (variant.available) {
+          // Available, enable the submit button, change text, show quantity elements
+          this.$addToCart
+            .removeClass('disabled')
+            .prop('disabled', false);
+          this.$addToCartText.html(translations.addToCart);
+          // $(this.selectors.quantityElements, this.$container).show();
+          // $(this.selectors.shopifyPaymentButton, this.$container).show();
+
+          // Update the full details link
+          // var $link = $(this.selectors.productFullDetails, this.$container);
+          // if ($link.length) {
+          //   $link.attr(
+          //     'href',
+          //     this.updateUrlParameter($link.attr('href'), 'variant', variant.id)
+          //   );
+          // }
+        } else {
+          // Sold out, disable the submit button, change text, hide quantity elements
+          this.$addToCart
+            .addClass('disabled')
+            .prop('disabled', true);
+          this.$addToCartText.html(translations.soldOut);
+          // $(this.selectors.quantityElements, this.$container).hide();
+          // $(this.selectors.shopifyPaymentButton, this.$container).hide();
+        }
+
+        this.$productPrice
+          .html(theme.Currency.formatMoney(variant.price, moneyFormat))
+          .show();
+
+        // Also update and show the product's compare price if necessary
+        if (variant.compare_at_price > variant.price) {
+          this.$comparePrice.html(
+            theme.Currency.formatMoney(variant.compare_at_price, moneyFormat)
+          );
+          this.$comparePriceWrapper.removeClass('hide');
+          this.$productPrice.addClass('on-sale');
+          this.$comparePriceWrapper.attr('aria-hidden', 'false');
+          this.$comparePriceA11y.attr('aria-hidden', 'false');
+        } else {
+          this.$comparePriceWrapper
+            .addClass('hide')
+            .attr('aria-hidden', 'true');
+          this.$productPrice
+            .removeClass('on-sale');
+          this.$comparePriceA11y.attr('aria-hidden','true');
+        }
+
+        if (variant.unit_price) {
+          this.$unitPrice.html(theme.Currency.formatMoney(variant.unit_price, moneyFormat));
+          this.$unitPriceBaseUnit.html(this.getBaseUnit(variant));
+          this.$priceContainer.addClass(classes.priceContainerUnitAvailable);
+        }
+
+        // Also Show SKU
+        this.$sku.html(variant.sku);
+      } else {
+        // The variant doesn't exist, disable submit button.
+        // This may be an error or notice that a specific variant is not available.
+        // To only show available variants, implement linked product options:
+        //   - http://docs.shopify.com/manual/configuration/store-customization/advanced-navigation/linked-product-options
+        this.$addToCart
+          .addClass('disabled')
+          .prop('disabled', true);
+        this.$addToCartText.html(translations.unavailable_html);
+        // $(this.selectors.quantityElements, this.$container).hide();
+        // $(this.selectors.shopifyPaymentButton, this.$container).hide();
+
+        // this.$priceContainer.addClass('visibility-hidden');
+        this.$productPrice.attr('aria-hidden', 'true');
+        this.$priceA11y.attr('aria-hidden', 'true');
+        this.$comparePriceWrapper.attr('aria-hidden', 'true');
+        this.$comparePriceA11y.attr('aria-hidden', 'true');
+      }      
+    },
+    getBaseUnit: function(variant) {
+      return variant.unit_price_measurement.reference_value === 1
+        ? variant.unit_price_measurement.reference_unit
+        : variant.unit_price_measurement.reference_value +
+            variant.unit_price_measurement.reference_unit;
+    },
+    createImageCarousel: function() {
+      this.$productImages.addClass(classes.owlCarousel);
+
+      this.carousel = this.$productImages.owlCarousel({
+        loop: true,
+        margin: 0,
+        nav: false,
+        dots: true,
+        items: 1
+      });
+
+      this.filterCarousel();
+    },
+    filterCarousel: function() {
+      if (this.carousel === null) return;
+
+      var val = this.$colorSelect.val();
+
+      if (val && val != '-') {
+        var selectedColor = val.toLowerCase().replace(/\s/g, '');
+
+        this.carousel.owlcarousel2_filter('.' + selectedColor);
+      }
+    },
+    createZoom: function() {
+      this.$productImages.magnificPopup({
+        delegate: selectors.productImagePhoto,
+        type: 'image',
+        midClick: true,
+        mainClass: 'mfp-fade',
+        closeOnBgClick: true,
+        closeBtnInside: false,
+        closeMarkup: '<button title="Close (Esc)" type="button" class="mfp-close"> <img src="https://cdn.shopify.com/s/files/1/2206/5449/files/close-modal.svg?5305"/> </button>',
+        closeOnContentClick: true,
+        tClose: theme.strings.zoomClose,
+        removalDelay: 500,
+        disableOn: function() {
+          return $(window).width() >= 992;
+        },
+        gallery: {
+          enabled: true,
+          navigateByImgClick: false,
+          arrowMarkup:
+            '<button title="%title%" type="button" class="mfp-arrow mfp-arrow-%dir%"><span class="mfp-chevron mfp-chevron-%dir%"></span></button>',
+          tPrev: theme.strings.zoomPrev,
+          tNext: theme.strings.zoomNext
+        }
+      });
+    }
+  });
+
+  function ShoppableProductsSection(container) {
+    this.$container = $(container);
+
+    this.shoppableProducts = $.map($('[data-shoppable-product]', this.$container), function(el) { return new ShoppableProduct(el); });
+  }
+
+  return ShoppableProductsSection;
+})();
+
+theme.LaunchProduct = (function() {
+  var selectors = {
+    productJSON: '[data-product-json]',
+    // productImageWrapper: '.product-single__photo-wrapper',
+    productImages: '.product-single__photos',
+    productImagePhoto: '.product-single__photo',
+    productImagePhotoFlexWrapper: '.product-single__photo--flex-wrapper',
+    // productThumbnail: '.product-single__thumbnail',
+    // productImagePhotoContainer: '.product-single__photo--container',
+    // productFullDetails: '.product-single__full-details',
+    // productForm: '.add-to-cart__form',
+    addToCart: '.btn--add-to-cart',
+    addToCartText: '.btn__text',
+    priceContainer: '[data-price-container]',
+    productPrice: '#ProductPrice',
+    SKU: '.variant-sku',
+    priceA11y: '#PriceA11y',
+    comparePrice: '#ComparePrice',
+    comparePriceA11y: '#ComparePriceA11y',
+    comparePriceWrapper: '.product-single__price--wrapper',
+    // quantityElements: '.js-quantity-selector, label + .js-qty',
+    originalSelectorId: '[data-variant-select]',
+    singleOptionSelector: '.single-option-selector__radio',
+    // radioWrapper: '.radio-wrapper',
+    // meta: '.product-single__meta',
+    // productWrapper: '.product-single',
+    // shopifyPaymentButton: '.shopify-payment-button',
+    colorSelect: 'select.color-select',
+    unitPrice: '[data-unit-price]',
+    unitPriceBaseUnit: '[data-unit-price-base-unit]'
+  };
+
+  var classes = {
+    priceContainerUnitAvailable: 'price-container--unit-available',
+    owlCarousel: 'owl-carousel owl-theme'
+  };
+
+  function LaunchProduct(container) {
+    this.settings = {
+      productPageLoad: false,
+      preloadImage: false,
+      enableHistoryState: false,
+      namespace: '.launchProduct'
+    };
+
+    var $container = (this.$container = $(container));
+    var sectionId = $container.attr('data-section-id');
+
+    if (!$('#ProductJson-' + sectionId).html()) {
+      return;
+    }
+
+    this.product = JSON.parse($('#ProductJson-' + sectionId).html());
+    this.zoomType = $container.data('image-zoom-type');
+
+    this.$addToCart = $(selectors.addToCart, this.$container);
+    this.$addToCartText = $(selectors.addToCartText, this.$container);
+    this.$priceContainer = $(selectors.priceContainer, this.$container);
+    this.$productPrice = $(selectors.productPrice, this.$container);
+    this.$priceA11y = $(selectors.priceA11y, this.$container);
+    // $(this.selectors.quantityElements, this.$container)
+    // $(this.selectors.shopifyPaymentButton, this.$container)    
+    this.$comparePrice = $(selectors.comparePrice, this.$container);
+    this.$comparePriceWrapper = $(selectors.comparePriceWrapper, this.$container);
+    this.$comparePriceA11y = $(selectors.comparePriceA11y, this.$container);
+    this.$unitPrice = $(selectors.unitPrice, this.$container);
+    this.$unitPriceBaseUnit = $(selectors.unitPriceBaseUnit, this.$container);
+    this.$sku = $(selectors.SKU, this.$container);
+    this.$colorSelect = $(selectors.colorSelect, this.$container);
+    this.$productImages = $(selectors.productImages, this.$container);
+    this.$productImagePhotos = $(selectors.productImagePhoto, this.$container);
+    this.$productFlexWrapper = $(selectors.productImagePhotoFlexWrapper, this.$container);
+
+    this.$colorSelect.on('change', this.onColorSelectChange.bind(this));
+
+    this.initBreakpoints();
+    this.stringOverrides();
+    this.initProductVariant();
+    this.productThumbnailSwitch();    
+
+    if (this.zoomType) {
+      this.productImageZoom();
+    }
+
+    if (theme.settings.cartType === 'drawer') {
+      ajaxCart.init({
+        formSelector: '#AddToCartForm--' + sectionId,
+        cartContainer: '#CartContainer',
+        addToCartSelector: '#AddToCart--' + sectionId,
+        enableQtySelectors: true,
+        moneyFormat: theme.strings.moneyFormat
+      });
+    }
+
+    this.onColorSelectChange();
+  }
+
+  LaunchProduct.prototype = _.assignIn({}, LaunchProduct.prototype, {
+    initProductVariant: function() {
+      var options = {
+        $container: this.$container,
+        enableHistoryState: this.$container.data('enable-history-state') || false,
+        singleOptionSelector: selectors.singleOptionSelector,
+        originalSelectorId: selectors.originalSelectorId,
+        product: this.product
+      };
+
+      this.variants = new slate.Variants(options);
+      this.$container.on('variantChange' + this.settings.namespace, this.onVariantChange.bind(this));
+    },
+    initBreakpoints: function() {
+      var self = this;
+      var $container = self.$container;
+      // self.zoomType = $container.data('image-zoom-type');
+
+      enquire.register(theme.variables.mediaQuerySmallZOR, {
+        match: function() {
+          self.createImageCarousel();
+          // self.$productImagePhotos.off();
+          // self.$productImages.off();
+          $(selectors.productImagePhoto, self.$container).off('click');
+        },
+        unmatch: function() {
+          self.destroyImageCarousel();
+          self.productImageZoom();
+        }
+      });
+    },
+    stringOverrides: function() {
+      // Override defaults in theme.strings with potential
+      // template overrides
+
+      theme.productStrings = theme.productStrings || {};
+      $.extend(theme.strings, theme.productStrings);
+    },
+    resizeElements: function() {
+      $(selectors.productGridImages, this.$container)
+        .imagesLoaded(function() {
+        $(selectors.productGridImages, this.$container)
+          .css('height', 'auto')
+          .equalHeights();
+      });
+    },
+    switchImage: function(imageId) {
+      $(selectors.productImagePhotoContainer, this.$container).addClass('hide');
+      $(selectors.productImagePhotoContainer, this.$container)
+        .filter('#ProductImageWrapper-' + imageId)
+        .removeClass('hide');
+    },
+    reorderImages: function() {
+      if (this.$container.data('scroll-to-image')) return;
+      var $newImage = $(
+        this.selectors.productImagePhotoContainer,
+        this.$container
+      ).not('.hide');
+      $newImage
+        .closest(
+          $(this.selectors.productImagePhotoFlexWrapper, this.$container)
+        )
+        .prependTo($(this.selectors.productImages, this.$container));
+    },
+    productThumbnailSwitch: function() {
+      var self = this;
+      var $productThumbnails = $('#ProductThumbs', this.$container).find(selectors.productThumbnail);
+
+      if ($productThumbnails.length) {
+        // Switch the main image with one of the thumbnails
+        // Note: this does not change the variant selected, just the image
+        $productThumbnails.on('click', function(evt) {
+          evt.preventDefault();
+          var newImageId = $(this).attr('data-image-id');
+          var $newImage = $(
+            '.product-single__photo[data-image-id="' + newImageId + '"]'
+          );
+
+          self.switchImage(newImageId);
+          self.setActiveThumbnail(newImageId);
+
+          // Thumbnail layout
+          // Move selected featured image to top
+          $newImage
+            .closest($(selectors.productImagePhotoFlexWrapper, self.$container))
+            .prependTo($(selectors.productImages, self.$container));
+        });
+      }
+    },
+    setActiveThumbnail: function(imageId) {
+      var $productThumbnails = $('#ProductThumbs', this.$container).find(selectors.productThumbnail);
+
+      if ($productThumbnails.length) {
+        var activeClass = 'active-thumb';
+        var $thumbnail = $(
+          selectors.productThumbnail + "[data-image-id='" + imageId + "']",
+          this.$container
+        );
+
+        $productThumbnails.removeClass(activeClass);
+        $thumbnail.addClass(activeClass);
+      }
+    },
+    productImageZoom: function() {
+      if ($(window).width() < 991) return;
+
+      var delegate = selectors.productImagePhoto;
+      var selectedColor = this.$colorSelect.val().replace(/\s/g, '').toLowerCase();
+
+      if (selectedColor && selectedColor != '-') {
+        delegate = '[data-variant="'+selectedColor+'"] ' + delegate;
+      }
+
+      $(selectors.productImagePhoto, this.$container).on('click', function() {
+        this.$productImages.magnificPopup({
+          delegate: delegate,
+          type: 'image',
+          midClick: true,
+          mainClass: 'mfp-fade',
+          closeOnBgClick: true,
+          closeBtnInside: false,
+          closeMarkup: '<button title="Close (Esc)" type="button" class="mfp-close"> <img src="https://cdn.shopify.com/s/files/1/2206/5449/files/close-modal.svg?5305"/> </button>',
+          closeOnContentClick: true,
+          tClose: theme.strings.zoomClose,
+          removalDelay: 500,
+          gallery: {
+            enabled: true,
+            navigateByImgClick: false,
+            arrowMarkup:
+              '<button title="%title%" type="button" class="mfp-arrow mfp-arrow-%dir%"><span class="mfp-chevron mfp-chevron-%dir%"></span></button>',
+            tPrev: theme.strings.zoomPrev,
+            tNext: theme.strings.zoomNext
+          }
+        });
+      }.bind(this))
+    },
+    filterCarousel: function() {
+      if (this.carousel === null || this.carousel === undefined) return;
+
+      var color = this.$colorSelect.val() && this.$colorSelect.val().replace(/\s/g, '').toLowerCase();
+
+      if (color && color != '-') {
+        this.carousel.owlcarousel2_filter('.' + color);
+      }
+    }, 
+    createImageCarousel: function() {
+      this.$productImages.addClass(classes.owlCarousel);
+
+      // this.carousel && this.$productImages.owlCarousel('destroy.owl.carousel');
+      this.carousel = this.$productImages.owlCarousel({
+        loop: true,
+        margin: 0,
+        nav: false,
+        dots: true,
+        items: 1
+      });
+
+      this.$productFlexWrapper.show();
+
+      this.filterCarousel();
+
+      return;
+
+      // $(window).on('resize', theme.debounce(function() {
+      //   if ( $(window).width() >= 991 ) {
+      //     if (this.$productImages.hasClass('owl-carousel') ) {
+      //       this.$productFlexWrapper.hide();
+            
+      //       this.carousel && this.carousel.owlcarousel2_filter( '*' );
+      //       // console.log('RESIZE 250 - owlfilter 250')
+
+      //       var selectedColor = ($('select.color-select').val() && $('select.color-select').val().toLowerCase() || '-');
+      //       var selectedFilter = selectedColor.replace(/\s/g, '');
+                    
+      //       setTimeout(function(){
+      //         // this.carousel && this.carousel.owlCarousel('destroy');
+      //         // this.carousel = null;
+      //         this.$productImages.removeClass(classes.owlCarousel);
+                   
+      //         if (selectedColor == '-') {
+      //           this.$productFlexWrapper.fadeIn('slow');
+      //         } else {
+      //           this.$productFlexWrapper.filter('[data-variant="'+selectedFilter+'"]').fadeIn('slow');
+      //         }
+      //       }.bind(this), 500);
+
+      //       // console.log('RESIZE create carousel - destroy slider / resize above 991 - b');
+      //     }
+      //   }
+      // }.bind(this), 50));
+    },
+    destroyImageCarousel: function() {
+      if (!this.$productImages.length) return;
+
+      this.$productFlexWrapper.show();
+
+      if ($(window).width() >= 991) {
+        if (this.$productImages.hasClass('owl-carousel') ) {
+
+          // this.$productFlexWrapper.hide();
+          
+          // this.carousel && this.carousel.owlcarousel2_filter( '*' );
+          // console.log('RESIZE 250 - owlfilter 250')
+
+          this.carousel && this.$productImages.owlCarousel('destroy');
+          this.carousel = null;          
+          this.$productImages.removeClass(classes.owlCarousel);
+
+          this.$productFlexWrapper.hide();
+
+          // var selectedColor = ($('select.color-select').val() && $('select.color-select').val().toLowerCase() || '-');
+          // var selectedFilter = selectedColor.replace(/\s/g, '');
+
+          setTimeout(function(){
+            this.$productFlexWrapper.fadeIn('slow');
+          }.bind(this), 500);
+
+          // console.log('RESIZE create carousel - destroy slider / resize above 991 - b');
+        }
+      }      
+    },
+    onColorSelectChange: function() {
+      var val = this.$colorSelect.val().replace(/\s/g, '').toLowerCase();
+
+      if (val && val != '-') {
+        if ( $(window).width() < 991 ) {
+          this.filterCarousel()
+        }
+        else {
+          this.$productFlexWrapper.hide();
+          setTimeout(function(){
+            this.$productFlexWrapper.filter('[data-variant="'+val+'"]').fadeIn('slow');  
+          }.bind(this), 20)
+        }
+      }
+
+      this.productImageZoom();
+    },
+    onVariantChange: function(evt) {
+      var moneyFormat = theme.strings.moneyFormat;
+      var variant = evt.variant;
+      var translations = theme.strings;
+
+      if (variant) {
+        this.$priceContainer.removeClass('visibility-hidden ' + classes.priceContainerUnitAvailable);
+        this.$productPrice.attr('aria-hidden', 'false');
+
+        // $(this.selectors.priceA11y, this.$container).attr(
+        //   'aria-hidden',
+        //   'false'
+        // );
+
+        // Select a valid variant if available
+        if (variant.available) {
+          // Available, enable the submit button, change text, show quantity elements
+          this.$addToCart
+            .removeClass('disabled')
+            .prop('disabled', false);
+          this.$addToCartText.html(translations.addToCart);
+          // $(this.selectors.quantityElements, this.$container).show();
+          // $(this.selectors.shopifyPaymentButton, this.$container).show();
+
+          // Update the full details link
+          // var $link = $(this.selectors.productFullDetails, this.$container);
+          // if ($link.length) {
+          //   $link.attr(
+          //     'href',
+          //     this.updateUrlParameter($link.attr('href'), 'variant', variant.id)
+          //   );
+          // }
+        } else {
+          // Sold out, disable the submit button, change text, hide quantity elements
+          this.$addToCart
+            .addClass('disabled')
+            .prop('disabled', true);
+          this.$addToCartText.html(translations.soldOut);
+          // $(this.selectors.quantityElements, this.$container).hide();
+          // $(this.selectors.shopifyPaymentButton, this.$container).hide();
+        }
+
+        this.$productPrice
+          .html(theme.Currency.formatMoney(variant.price, moneyFormat))
+          .show();
+
+        // Also update and show the product's compare price if necessary
+        if (variant.compare_at_price > variant.price) {
+          this.$comparePrice.html(
+            theme.Currency.formatMoney(variant.compare_at_price, moneyFormat)
+          );
+          this.$comparePriceWrapper.removeClass('hide');
+          this.$productPrice.addClass('on-sale');
+          this.$comparePriceWrapper.attr('aria-hidden', 'false');
+          this.$comparePriceA11y.attr('aria-hidden', 'false');
+        } else {
+          this.$comparePriceWrapper
+            .addClass('hide')
+            .attr('aria-hidden', 'true');
+          this.$productPrice
+            .removeClass('on-sale');
+          this.$comparePriceA11y.attr('aria-hidden','true');
+        }
+
+        if (variant.unit_price) {
+          this.$unitPrice.html(theme.Currency.formatMoney(variant.unit_price, moneyFormat));
+          this.$unitPriceBaseUnit.html(this.getBaseUnit(variant));
+          this.$priceContainer.addClass(classes.priceContainerUnitAvailable);
+        }
+
+        // Also Show SKU
+        this.$sku.html(variant.sku);
+      } else {
+        // The variant doesn't exist, disable submit button.
+        // This may be an error or notice that a specific variant is not available.
+        // To only show available variants, implement linked product options:
+        //   - http://docs.shopify.com/manual/configuration/store-customization/advanced-navigation/linked-product-options
+        this.$addToCart
+          .addClass('disabled')
+          .prop('disabled', true);
+        this.$addToCartText.html(translations.unavailable_html);
+        // $(this.selectors.quantityElements, this.$container).hide();
+        // $(this.selectors.shopifyPaymentButton, this.$container).hide();
+
+        // this.$priceContainer.addClass('visibility-hidden');
+        this.$productPrice.attr('aria-hidden', 'true');
+        this.$priceA11y.attr('aria-hidden', 'true');
+        this.$comparePriceWrapper.attr('aria-hidden', 'true');
+        this.$comparePriceA11y.attr('aria-hidden', 'true');
+      }      
+    },
+    onUnload: function() {
+      this.$container.off(this.settings.namespace);
+      this.destroyImageCarousel();
+    },    
+    getBaseUnit: function(variant) {
+      return variant.unit_price_measurement.reference_value === 1
+        ? variant.unit_price_measurement.reference_unit
+        : variant.unit_price_measurement.reference_value +
+            variant.unit_price_measurement.reference_unit;
+    }
+  });
+
+  return LaunchProduct;
+})();
+
 
 theme.variables = {
   productPageLoad     : false,
@@ -4848,6 +5533,8 @@ $(document).ready(function() {
   sections.register('collection-template', theme.Collection);
   sections.register('header-section', theme.HeaderSection);
   sections.register('featured-content-section', theme.FeaturedContentSection);
+  sections.register('shoppable-products', theme.ShoppableProducts);
+  sections.register('launch-product', theme.LaunchProduct);
   sections.register('newsletter-section', theme.NewsletterSection);
   sections.register('slideshow-section', theme.SlideshowSection);
   sections.register('password-header', theme.PasswordHeader);
