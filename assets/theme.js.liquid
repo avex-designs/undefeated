@@ -3420,7 +3420,6 @@ theme.Search = (function() {
 })();
 
 
-
 theme.variables = {
   productPageLoad     : false,
   productPageSticky   : true,
@@ -3539,7 +3538,7 @@ theme.fitNav = function() {
   controlNav();
   
   function controlNav() {
-	
+  
     if ( $(window).width() < 1024 ) {
       theme.cache.$siteNav.addClass('site-nav--compress');
       theme.cache.$siteNav.parent().addClass('visually-hidden');
